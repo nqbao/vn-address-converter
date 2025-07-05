@@ -25,7 +25,7 @@ setup(
     ],
     python_requires=">=3.10",
     install_requires=[
-        # Add your dependencies here
+        "msgspec>=0.19.0",
     ],
     extras_require={
         "dev": [
