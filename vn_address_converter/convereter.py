@@ -5,11 +5,12 @@ import unicodedata
 from typing import TypedDict
 from enum import Enum
 
+# Address TypedDict represents a Vietnamese address with optional fields.
 class Address(TypedDict):
-    street: str | None
-    ward: str | None
-    district: str | None
-    province: str | None
+    street_address: str | None  # Street address (optional)
+    ward: str | None           # Ward/commune name (optional)
+    district: str | None       # District name (optional)
+    province: str | None       # Province/city name (optional)
 
 class AddressLevel(Enum):
     PROVINCE = 'province'
@@ -66,11 +67,11 @@ def _get_ward_mapping():
         }
     return WARD_MAPPING
 
-def convert_address(address: Address) -> Address:
+def convert_to_new_address(address: Address) -> Address:
     province = address.get('province')
     district = address.get('district')
     ward = address.get('ward')
-    street = address.get('street')
+    street_address = address.get('street_address')
 
     if not province or not district or not ward:
         raise ValueError('Missing province, district, or ward in address')
@@ -103,7 +104,7 @@ def convert_address(address: Address) -> Address:
     new_ward = ward_map['new_ward_name']
 
     return Address(
-        street=street,
+        street_address=street_address,
         ward=new_ward,
         district=None,
         province=new_province

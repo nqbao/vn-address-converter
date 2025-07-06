@@ -1,6 +1,6 @@
-from .convereter import convert_address, Address
+from .convereter import convert_to_new_address, Address
 
 __all__ = [
-    "convert_address",
+    "convert_to_new_address",
     "Address",
 ]

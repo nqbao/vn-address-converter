@@ -14,4 +14,3 @@ mypy>=0.950
 build
 tox>=4.0.0
 twine>=4.0.0
-msgspec>=0.19.0
