@@ -1,6 +1,6 @@
 # Vietnam Address Converter
 
-This is the result of my vibe coding experiment to fully use AI to solve a problem.
+This is the result of my vibe coding experiment to fully use AI to solve a problem. Check out my [blog](https://nqbao.medium.com/vibe-coding-a-python-package-converting-old-to-new-vietnamese-addresses-9ba0e07a89bb) here.
 
 Vietnam recently merged 63 provinces into 34, creating a need to convert old addresses to the new administrative format. This Python package provides a solution for converting old Vietnamese addresses to the new format.
 
