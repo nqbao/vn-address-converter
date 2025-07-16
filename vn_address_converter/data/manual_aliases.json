@@ -1,0 +1,104 @@
+{
+  "provinces": {
+    "Thành phố Hồ Chí Minh": [
+      "HCM",
+      "Ho Chi Minh City",
+      "Sài Gòn",
+      "Saigon",
+      "TPHCM"
+    ],
+    "Thành phố Hà Nội": [
+      "Hà Nội",
+      "Hanoi",
+      "Ha Noi"
+    ],
+    "Thành phố Đà Nẵng": [
+      "Đà Nẵng",
+      "Da Nang",
+      "Danang"
+    ],
+    "Thành phố Cần Thơ": [
+      "Cần Thơ",
+      "Can Tho",
+      "Cantho"
+    ],
+    "Thành phố Hải Phòng": [
+      "Hải Phòng",
+      "Hai Phong",
+      "Haiphong"
+    ]
+  },
+  "districts": {
+    "Thành phố Hồ Chí Minh": {
+      "Quận Gò Vấp": [
+        "Gò Vấp",
+        "Go Vap",
+        "Q. Gò Vấp"
+      ],
+      "Quận 1": [
+        "Q1",
+        "District 1",
+        "Q.1"
+      ],
+      "Quận 3": [
+        "Q3",
+        "District 3",
+        "Q.3"
+      ]
+    },
+    "Thành phố Hà Nội": {
+      "Quận Ba Đình": [
+        "Ba Đình",
+        "Ba Dinh",
+        "Q. Ba Đình"
+      ],
+      "Quận Hoàn Kiếm": [
+        "Hoàn Kiếm",
+        "Hoan Kiem",
+        "Q. Hoàn Kiếm"
+      ]
+    }
+  },
+  "wards": {
+    "Thành phố Hồ Chí Minh": {
+      "Quận Gò Vấp": {
+        "Phường 12": [
+          "P12",
+          "Ward 12",
+          "P.12"
+        ],
+        "Phường 14": [
+          "P14",
+          "Ward 14",
+          "P.14"
+        ]
+      },
+      "Quận 1": {
+        "Phường Bến Nghé": [
+          "Bến Nghé",
+          "Ben Nghe",
+          "P. Bến Nghé"
+        ],
+        "Phường Bến Thành": [
+          "Bến Thành",
+          "Ben Thanh",
+          "P. Bến Thành"
+        ]
+      }
+    },
+    "Thành phố Hà Nội": {
+      "Quận Ba Đình": {
+        "Phường Phúc Xá": [
+          "Phúc Xá",
+          "Phuc Xa",
+          "P. Phúc Xá"
+        ],
+        "Phường Trúc Bạch": [
+          "Trúc Bạch",
+          "Truc Bach",
+          "P. Trúc Bạch"
+        ]
+      }
+    }
+  }
+}

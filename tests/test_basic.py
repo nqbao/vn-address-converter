@@ -4,6 +4,12 @@ Basic functionality tests for vn-address-converter.
 from vn_address_converter import convert_to_new_address, Address, AddressLevel
 from vn_address_converter.converter import normalize_alias
 import pytest
+import unicodedata
+
+
+def unicode_equal(str1: str, str2: str) -> bool:
+    """Compare two strings with Unicode normalization."""
+    return unicodedata.normalize("NFC", str1) == unicodedata.normalize("NFC", str2)
 
 @pytest.mark.parametrize("address,expected", [
     (
@@ -261,3 +267,39 @@ def test_convert_address_cam_ranh():
     assert result['province'] == "Khánh Hòa"
     # Ward should be preserved in this case
     assert result['ward'] == "Phường Ba Ngòi"
+
+
+def test_manual_aliases():
+    """Test manual aliases functionality"""
+    # Test province alias
+    result1 = convert_to_new_address(Address(
+        street_address="123 Test St",
+        ward="Phường 12",
+        district="Quận Gò Vấp",
+        province="HCM"  # Using manual alias
+    ))
+    assert result1['province'] == "Thành phố Hồ Chí Minh"
+    assert result1['district'] is None
+    assert unicode_equal(result1['ward'], "Phường An Hội Tây")
+
+    # Test district alias
+    result2 = convert_to_new_address(Address(
+        street_address="456 Test St",
+        ward="Phường 12",
+        district="Gò Vấp",  # Using manual alias
+        province="Thành phố Hồ Chí Minh"
+    ))
+    assert result2['province'] == "Thành phố Hồ Chí Minh"
+    assert result2['district'] is None
+    assert unicode_equal(result2['ward'], "Phường An Hội Tây")
+
+    # Test ward alias
+    result3 = convert_to_new_address(Address(
+        street_address="789 Test St",
+        ward="P12",  # Using manual alias
+        district="Quận Gò Vấp",
+        province="Thành phố Hồ Chí Minh"
+    ))
+    assert result3['province'] == "Thành phố Hồ Chí Minh"
+    assert result3['district'] is None
+    assert unicode_equal(result3['ward'], "Phường An Hội Tây")
