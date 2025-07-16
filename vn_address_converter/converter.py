@@ -106,6 +106,54 @@ def _get_ward_mapping():
         }
     return WARD_MAPPING
 
+def parse_address(address_string: str) -> Address:
+    """Parse an address string into components.
+    
+    Args:
+        address_string: Address string separated by comma, semicolon, pipe, or hyphen in format:
+                       "street_address, ward, district, province"
+    
+    Returns:
+        Address: Parsed address with components
+    
+    Raises:
+        ValueError: If address string format is invalid
+    """
+    if not address_string or not address_string.strip():
+        raise ValueError("Address string cannot be empty")
+    
+    # Try different separators in order of preference
+    separators = [',', ';', '|', '-']
+    parts = None
+    
+    for separator in separators:
+        if separator in address_string:
+            parts = [part.strip() for part in address_string.split(separator)]
+            break
+    
+    if parts is None:
+        # No separator found, treat as single component
+        parts = [address_string.strip()]
+    
+    if len(parts) < 3:
+        raise ValueError("Address must have at least ward, district, and province")
+    elif len(parts) == 3:
+        # Format: "ward, district, province"
+        ward, district, province = parts
+        street_address = None
+    elif len(parts) == 4:
+        # Format: "street_address, ward, district, province"
+        street_address, ward, district, province = parts
+    else:
+        raise ValueError("Address has too many components")
+    
+    return Address(
+        street_address=street_address if street_address else None,
+        ward=ward if ward else None,
+        district=district if district else None,
+        province=province if province else None
+    )
+
 def convert_to_new_address(address: Address) -> Address:
     province = address.get('province')
     district = address.get('district')

@@ -73,16 +73,7 @@ $(TEST_DIR):
 # Run tests
 test: $(TEST_DIR)
 	@echo "$(GREEN)Running tests...$(NC)"
-	@if [ -f $(TEST_DIR)/test_*.py ] || [ -f $(TEST_DIR)/*_test.py ]; then \
-		pytest $(TEST_DIR) -v; \
-	else \
-		echo "$(YELLOW)No test files found. Creating a basic test...$(NC)"; \
-		echo "def test_import():" > $(TEST_DIR)/test_basic.py; \
-		echo "    from vn_address_converter import convert_address, Address" >> $(TEST_DIR)/test_basic.py; \
-		echo "    assert convert_address is not None" >> $(TEST_DIR)/test_basic.py; \
-		echo "    assert Address is not None" >> $(TEST_DIR)/test_basic.py; \
-		pytest $(TEST_DIR) -v; \
-	fi
+	pytest $(TEST_DIR) -v;
 
 # Run linting
 lint:

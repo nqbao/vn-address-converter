@@ -13,12 +13,6 @@ Vietnam Address Converter is a Python package that converts old Vietnamese addre
 - `make install` - Install package in development mode
 - `make setup-dev` - Full development environment setup
 
-### Code Quality
-- `make lint` - Run flake8 linting (max line length 88)
-- `make format` - Format code with black
-- `make type-check` - Run mypy type checking
-- `make check-all` - Run all quality checks (lint, type-check, test)
-
 ### Testing
 - `make test` - Run pytest tests with coverage
 - `pytest tests/` - Run tests directly
@@ -44,6 +38,7 @@ Vietnam Address Converter is a Python package that converts old Vietnamese addre
 - `Address` TypedDict: Represents Vietnamese addresses with optional fields
 - `AddressLevel` Enum: Defines administrative levels (province, district, ward)
 - `convert_to_new_address()`: Main conversion function that maps old addresses to new format
+- `parse_address()`: Parses address strings with support for multiple separators (comma, semicolon, pipe, hyphen)
 - `normalize_alias()`: Normalizes address component names by removing prefixes
 - `_get_ward_mapping()`: Loads and caches mapping data with normalized aliases
 
@@ -61,7 +56,8 @@ Vietnam Address Converter is a Python package that converts old Vietnamese addre
 1. **Lazy Loading**: Ward mapping data is loaded once and cached globally in `WARD_MAPPING`
 2. **Normalization**: Address components are normalized by removing administrative prefixes (e.g., "Phường", "Quận") using `normalize_alias()`
 3. **Alias Mapping**: Multiple normalized forms are stored for fuzzy matching (original name + normalized alias)
-4. **Error Handling**: Raises ValueError for unmapped addresses with specific error messages
+4. **Flexible Parsing**: Address parsing supports multiple separator types (comma, semicolon, pipe, hyphen) with automatic detection
+5. **Error Handling**: Raises ValueError for unmapped addresses with specific error messages
 
 ### Testing Strategy
 
@@ -70,7 +66,17 @@ Tests use parametrized pytest with real-world address examples covering:
 - Alias resolution
 - Edge cases from different provinces
 - Both formal and informal address formats
+- Non-standard address formats with different separators (semicolon, pipe, hyphen)
 - Error handling for missing/invalid addresses
+
+## Development Planning
+
+**TODO.md** - Contains planned feature enhancements and additional functions to be implemented:
+- Address validation and verification functions
+- Batch processing capabilities for multiple addresses
+- Geographic and administrative utilities
+- Reverse lookup and search functionality
+- Format and export options
 
 ## Important Notes
 
