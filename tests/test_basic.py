@@ -2,7 +2,7 @@
 Basic functionality tests for vn-address-converter.
 """
 from vn_address_converter import convert_to_new_address, Address, AddressLevel
-from vn_address_converter.convereter import normalize_alias
+from vn_address_converter.converter import normalize_alias
 import pytest
 
 @pytest.mark.parametrize("address,expected", [

@@ -40,25 +40,27 @@ Vietnam Address Converter is a Python package that converts old Vietnamese addre
 
 ### Core Components
 
-**vn_address_converter/convereter.py** - Main conversion logic
+**vn_address_converter/converter.py** - Main conversion logic
 - `Address` TypedDict: Represents Vietnamese addresses with optional fields
 - `AddressLevel` Enum: Defines administrative levels (province, district, ward)
 - `convert_to_new_address()`: Main conversion function that maps old addresses to new format
 - `normalize_alias()`: Normalizes address component names by removing prefixes
 - `_get_ward_mapping()`: Loads and caches mapping data with normalized aliases
 
-**vn_address_converter/data/ward_mapping.json** - Contains complete mapping data from old to new administrative divisions
+**vn_address_converter/data/ward_mapping.json** - Complete mapping data from old to new administrative divisions
 
 ### Data Processing Pipeline
 
-**pipelines/** directory contains data extraction and processing scripts:
-This was result from a prototype, not relevant anymore.
+**pipelines/** directory contains data extraction and processing scripts from the original development (historical):
+- `extract_tables.py` - Extracts mapping data from HTML tables
+- `llm_table_extractor.py` - Uses LLM to process table data
+- `convert_to_new_format.py` - Converts extracted data to final format
 
 ### Key Design Patterns
 
-1. **Lazy Loading**: Ward mapping data is loaded once and cached globally
-2. **Normalization**: Address components are normalized by removing administrative prefixes (e.g., "Phường", "Quận")
-3. **Alias Mapping**: Multiple normalized forms are stored for fuzzy matching
+1. **Lazy Loading**: Ward mapping data is loaded once and cached globally in `WARD_MAPPING`
+2. **Normalization**: Address components are normalized by removing administrative prefixes (e.g., "Phường", "Quận") using `normalize_alias()`
+3. **Alias Mapping**: Multiple normalized forms are stored for fuzzy matching (original name + normalized alias)
 4. **Error Handling**: Raises ValueError for unmapped addresses with specific error messages
 
 ### Testing Strategy
@@ -68,6 +70,7 @@ Tests use parametrized pytest with real-world address examples covering:
 - Alias resolution
 - Edge cases from different provinces
 - Both formal and informal address formats
+- Error handling for missing/invalid addresses
 
 ## Important Notes
 
@@ -76,3 +79,4 @@ Tests use parametrized pytest with real-world address examples covering:
 - All mapping data is stored in JSON format for easy updates
 - The converter returns `district=None` as districts are eliminated in the new format
 - Coverage target is set to 80% minimum
+- The mapping data structure has a typo in the JSON key: `new_provine_name` instead of `new_province_name`
