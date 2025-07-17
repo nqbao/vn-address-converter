@@ -61,9 +61,12 @@ class TestParseAddress:
             parse_address("Phường 1, Quận 7")
     
     def test_parse_address_too_many_components(self):
-        """Test parsing address with too many components raises ValueError."""
-        with pytest.raises(ValueError, match="Address has too many components"):
-            parse_address("123 Street, Building A, Phường 1, Quận 7, Thành phố Hồ Chí Minh")
+        """Test parsing address with too many components combines them into street_address."""
+        address = parse_address("123 Street, Building A, Phường 1, Quận 7, Thành phố Hồ Chí Minh")
+        assert address.street_address == "123 Street, Building A"
+        assert address.ward == "Phường 1"
+        assert address.district == "Quận 7"
+        assert address.province == "Thành phố Hồ Chí Minh"
     
     def test_parse_address_empty_components(self):
         """Test parsing address with empty components."""
@@ -84,6 +87,16 @@ class TestParseAddress:
         assert result.ward == "Phường Bến Nghé"
         assert result.district == "Quận 1"
         assert result.province == "Thành phố Hồ Chí Minh"
+    
+    def test_parse_address_with_empty_component(self):
+        """Test parsing address with empty component (double comma)."""
+        address_str = "Thôn Quảng Đạt, xã Ngũ Phúc, , Huyện Kim Thành, Hải Dương"
+        result = parse_address(address_str)
+        
+        assert result.street_address == "Thôn Quảng Đạt"
+        assert result.ward == "xã Ngũ Phúc"
+        assert result.district == "Huyện Kim Thành"
+        assert result.province == "Hải Dương"
     
     @pytest.mark.parametrize("address_str,expected", [
         ("Phường 1, Quận 7, Thành phố Hồ Chí Minh", {

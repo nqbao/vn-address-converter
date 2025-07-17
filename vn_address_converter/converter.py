@@ -116,12 +116,16 @@ def parse_address(address_string: str) -> Address:
     
     for separator in separators:
         if separator in address_string:
-            parts = [part.strip() for part in address_string.split(separator)]
+            parts = [part.strip() for part in address_string.split(separator) if part.strip()]
             break
     
     if parts is None:
         # No separator found, treat as single component
         parts = [address_string.strip()]
+
+    if parts[-1] in ("Việt Nam", "Vienam"):
+        # Remove "Việt Nam" if it's the last part
+        parts = parts[:-1]
     
     if len(parts) < 3:
         raise ValueError("Address must have at least ward, district, and province")
@@ -133,7 +137,11 @@ def parse_address(address_string: str) -> Address:
         # Format: "street_address, ward, district, province"
         street_address, ward, district, province = parts
     else:
-        raise ValueError("Address has too many components")
+        # Format: "street_address_part1, street_address_part2, ..., ward, district, province"
+        # Take the last 3 parts as ward, district, province
+        # Combine the rest as street_address
+        ward, district, province = parts[-3:]
+        street_address = ", ".join(parts[:-3])
     
     return Address(
         street_address=street_address if street_address else None,
