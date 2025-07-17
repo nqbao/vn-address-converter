@@ -75,6 +75,10 @@ test: $(TEST_DIR)
 	@echo "$(GREEN)Running tests...$(NC)"
 	pytest $(TEST_DIR) -v;
 
+streamlit:
+	@echo "$(GREEN)Running Streamlit app...$(NC)"
+	streamlit run streamlit_app.py
+
 # Run linting
 lint:
 	@echo "$(GREEN)Running linting...$(NC)"

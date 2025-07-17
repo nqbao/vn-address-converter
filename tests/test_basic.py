@@ -185,13 +185,13 @@ def test_convert_address_case_variations():
         province="THÀNH PHỐ HỒ CHÍ MINH"
     ))
     # Check that conversion works with uppercase input
-    assert result['street_address'] == "100 Trần Hưng Đạo"
-    assert result['district'] is None
-    assert result['province'] == "Thành phố Hồ Chí Minh"
+    assert result.street_address == "100 Trần Hưng Đạo"
+    assert result.district is None
+    assert result.province == "Thành phố Hồ Chí Minh"
     # Ward should map to the correct new name
-    assert 'Phường' in result['ward']
-    assert 'An H' in result['ward']
-    assert 'Tây' in result['ward']
+    assert 'Phường' in result.ward
+    assert 'An H' in result.ward
+    assert 'Tây' in result.ward
 
 
 def test_convert_address_with_spaces():
@@ -203,12 +203,12 @@ def test_convert_address_with_spaces():
         province="  thành phố hồ chí minh  "
     ))
     # Check that conversion works with extra spaces
-    assert result['street_address'] == "  200 Nguyễn Thị Minh Khai  "
-    assert result['district'] is None
-    assert result['province'] == "Thành phố Hồ Chí Minh"
+    assert result.street_address == "  200 Nguyễn Thị Minh Khai  "
+    assert result.district is None
+    assert result.province == "Thành phố Hồ Chí Minh"
     # Ward should map to the correct new name
-    assert 'Phường' in result['ward']
-    assert 'Nhơn' in result['ward']
+    assert 'Phường' in result.ward
+    assert 'Nhơn' in result.ward
 
 
 def test_convert_address_khanh_hoa():
@@ -220,12 +220,12 @@ def test_convert_address_khanh_hoa():
         province="Tỉnh Khánh Hòa"
     ))
     # Check that conversion works with Tỉnh format
-    assert result['street_address'] == "300 Yersin"
-    assert result['district'] is None
-    assert result['province'] == "Khánh Hòa"
+    assert result.street_address == "300 Yersin"
+    assert result.district is None
+    assert result.province == "Khánh Hòa"
     # Ward should map to the correct new name
-    assert 'Phường' in result['ward']
-    assert 'Thắng' in result['ward']
+    assert 'Phường' in result.ward
+    assert 'Thắng' in result.ward
 
 
 def test_convert_address_go_vap_variations():
@@ -237,9 +237,9 @@ def test_convert_address_go_vap_variations():
         district="Quận Gò Vấp",
         province="Thành phố Hồ Chí Minh"
     ))
-    assert result1['district'] is None
-    assert result1['province'] == "Thành phố Hồ Chí Minh"
-    assert 'Hạnh Thông' in result1['ward']
+    assert result1.district is None
+    assert result1.province == "Thành phố Hồ Chí Minh"
+    assert 'Hạnh Thông' in result1.ward
 
     # Test Phường 10 -> Phường Gò Vấp
     result2 = convert_to_new_address(Address(
@@ -248,9 +248,9 @@ def test_convert_address_go_vap_variations():
         district="Quận Gò Vấp",
         province="Thành phố Hồ Chí Minh"
     ))
-    assert result2['district'] is None
-    assert result2['province'] == "Thành phố Hồ Chí Minh"
-    assert 'Gò Vấp' in result2['ward']
+    assert result2.district is None
+    assert result2.province == "Thành phố Hồ Chí Minh"
+    assert 'Gò Vấp' in result2.ward
 
 
 def test_convert_address_cam_ranh():
@@ -262,11 +262,11 @@ def test_convert_address_cam_ranh():
         province="Tỉnh Khánh Hòa"
     ))
     # Check that conversion works
-    assert result['street_address'] == "789 Trần Phú"
-    assert result['district'] is None
-    assert result['province'] == "Khánh Hòa"
+    assert result.street_address == "789 Trần Phú"
+    assert result.district is None
+    assert result.province == "Khánh Hòa"
     # Ward should be preserved in this case
-    assert result['ward'] == "Phường Ba Ngòi"
+    assert result.ward == "Phường Ba Ngòi"
 
 
 def test_manual_aliases():
@@ -278,9 +278,9 @@ def test_manual_aliases():
         district="Quận Gò Vấp",
         province="HCM"  # Using manual alias
     ))
-    assert result1['province'] == "Thành phố Hồ Chí Minh"
-    assert result1['district'] is None
-    assert unicode_equal(result1['ward'], "Phường An Hội Tây")
+    assert result1.province == "Thành phố Hồ Chí Minh"
+    assert result1.district is None
+    assert unicode_equal(result1.ward, "Phường An Hội Tây")
 
     # Test district alias
     result2 = convert_to_new_address(Address(
@@ -289,9 +289,9 @@ def test_manual_aliases():
         district="Gò Vấp",  # Using manual alias
         province="Thành phố Hồ Chí Minh"
     ))
-    assert result2['province'] == "Thành phố Hồ Chí Minh"
-    assert result2['district'] is None
-    assert unicode_equal(result2['ward'], "Phường An Hội Tây")
+    assert result2.province == "Thành phố Hồ Chí Minh"
+    assert result2.district is None
+    assert unicode_equal(result2.ward, "Phường An Hội Tây")
 
     # Test ward alias
     result3 = convert_to_new_address(Address(
@@ -300,6 +300,6 @@ def test_manual_aliases():
         district="Quận Gò Vấp",
         province="Thành phố Hồ Chí Minh"
     ))
-    assert result3['province'] == "Thành phố Hồ Chí Minh"
-    assert result3['district'] is None
-    assert unicode_equal(result3['ward'], "Phường An Hội Tây")
+    assert result3.province == "Thành phố Hồ Chí Minh"
+    assert result3.district is None
+    assert unicode_equal(result3.ward, "Phường An Hội Tây")

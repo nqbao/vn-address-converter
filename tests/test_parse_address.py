@@ -10,40 +10,40 @@ class TestParseAddress:
         address_str = "123 Nguyen Van Linh, Phường 1, Quận 7, Thành phố Hồ Chí Minh"
         result = parse_address(address_str)
         
-        assert result['street_address'] == "123 Nguyen Van Linh"
-        assert result['ward'] == "Phường 1"
-        assert result['district'] == "Quận 7"
-        assert result['province'] == "Thành phố Hồ Chí Minh"
+        assert result.street_address == "123 Nguyen Van Linh"
+        assert result.ward == "Phường 1"
+        assert result.district == "Quận 7"
+        assert result.province == "Thành phố Hồ Chí Minh"
     
     def test_parse_address_without_street_address(self):
         """Test parsing address without street address."""
         address_str = "Phường 1, Quận 7, Thành phố Hồ Chí Minh"
         result = parse_address(address_str)
         
-        assert result['street_address'] is None
-        assert result['ward'] == "Phường 1"
-        assert result['district'] == "Quận 7"
-        assert result['province'] == "Thành phố Hồ Chí Minh"
+        assert result.street_address is None
+        assert result.ward == "Phường 1"
+        assert result.district == "Quận 7"
+        assert result.province == "Thành phố Hồ Chí Minh"
     
     def test_parse_address_with_whitespace(self):
         """Test parsing address with extra whitespace."""
         address_str = "  123 Le Loi  ,  Phường 2  ,  Quận 1  ,  Thành phố Hồ Chí Minh  "
         result = parse_address(address_str)
         
-        assert result['street_address'] == "123 Le Loi"
-        assert result['ward'] == "Phường 2"
-        assert result['district'] == "Quận 1"
-        assert result['province'] == "Thành phố Hồ Chí Minh"
+        assert result.street_address == "123 Le Loi"
+        assert result.ward == "Phường 2"
+        assert result.district == "Quận 1"
+        assert result.province == "Thành phố Hồ Chí Minh"
     
     def test_parse_address_different_province(self):
         """Test parsing address from different province."""
         address_str = "456 Tran Hung Dao, Xã Tân Thạnh, Huyện Cần Giờ, Tỉnh Khánh Hòa"
         result = parse_address(address_str)
         
-        assert result['street_address'] == "456 Tran Hung Dao"
-        assert result['ward'] == "Xã Tân Thạnh"
-        assert result['district'] == "Huyện Cần Giờ"
-        assert result['province'] == "Tỉnh Khánh Hòa"
+        assert result.street_address == "456 Tran Hung Dao"
+        assert result.ward == "Xã Tân Thạnh"
+        assert result.district == "Huyện Cần Giờ"
+        assert result.province == "Tỉnh Khánh Hòa"
     
     def test_parse_address_empty_string(self):
         """Test parsing empty string raises ValueError."""
@@ -70,20 +70,20 @@ class TestParseAddress:
         address_str = ", Phường 1, Quận 7, Thành phố Hồ Chí Minh"
         result = parse_address(address_str)
         
-        assert result['street_address'] is None
-        assert result['ward'] == "Phường 1"
-        assert result['district'] == "Quận 7"
-        assert result['province'] == "Thành phố Hồ Chí Minh"
+        assert result.street_address is None
+        assert result.ward == "Phường 1"
+        assert result.district == "Quận 7"
+        assert result.province == "Thành phố Hồ Chí Minh"
     
     def test_parse_address_special_characters(self):
         """Test parsing address with special characters."""
         address_str = "123/45 Đường Nguyễn Huệ, Phường Bến Nghé, Quận 1, Thành phố Hồ Chí Minh"
         result = parse_address(address_str)
         
-        assert result['street_address'] == "123/45 Đường Nguyễn Huệ"
-        assert result['ward'] == "Phường Bến Nghé"
-        assert result['district'] == "Quận 1"
-        assert result['province'] == "Thành phố Hồ Chí Minh"
+        assert result.street_address == "123/45 Đường Nguyễn Huệ"
+        assert result.ward == "Phường Bến Nghé"
+        assert result.district == "Quận 1"
+        assert result.province == "Thành phố Hồ Chí Minh"
     
     @pytest.mark.parametrize("address_str,expected", [
         ("Phường 1, Quận 7, Thành phố Hồ Chí Minh", {
@@ -108,16 +108,21 @@ class TestParseAddress:
     def test_parse_address_parametrized(self, address_str, expected):
         """Parametrized test for various address formats."""
         result = parse_address(address_str)
-        assert result == expected
+        assert result.street_address == expected['street_address']
+        assert result.ward == expected['ward']
+        assert result.district == expected['district']
+        assert result.province == expected['province']
     
     def test_parse_address_returns_address_type(self):
         """Test that parse_address returns Address type."""
         address_str = "Phường 1, Quận 7, Thành phố Hồ Chí Minh"
         result = parse_address(address_str)
         
-        # Check that result is an Address TypedDict
-        assert isinstance(result, dict)
-        assert set(result.keys()) == {'street_address', 'ward', 'district', 'province'}
+        # Check that result is an Address dataclass
+        assert hasattr(result, 'street_address')
+        assert hasattr(result, 'ward')
+        assert hasattr(result, 'district')
+        assert hasattr(result, 'province')
     
     def test_parse_address_non_standard_formats(self):
         """Test parsing non-standard address formats."""
@@ -125,25 +130,25 @@ class TestParseAddress:
         address_str = "123 Lê Lợi; Phường 1; Quận 7; Thành phố Hồ Chí Minh"
         result = parse_address(address_str)
         
-        assert result['street_address'] == "123 Lê Lợi"
-        assert result['ward'] == "Phường 1"
-        assert result['district'] == "Quận 7"
-        assert result['province'] == "Thành phố Hồ Chí Minh"
+        assert result.street_address == "123 Lê Lợi"
+        assert result.ward == "Phường 1"
+        assert result.district == "Quận 7"
+        assert result.province == "Thành phố Hồ Chí Minh"
         
         # Test with hyphen separator
         address_str = "456 Nguyễn Trãi - Phường 2 - Quận 1 - Thành phố Hồ Chí Minh"
         result = parse_address(address_str)
         
-        assert result['street_address'] == "456 Nguyễn Trãi"
-        assert result['ward'] == "Phường 2"
-        assert result['district'] == "Quận 1"
-        assert result['province'] == "Thành phố Hồ Chí Minh"
+        assert result.street_address == "456 Nguyễn Trãi"
+        assert result.ward == "Phường 2"
+        assert result.district == "Quận 1"
+        assert result.province == "Thành phố Hồ Chí Minh"
         
         # Test with pipe separator
         address_str = "789 Hai Bà Trưng | Phường 3 | Quận 3 | Thành phố Hồ Chí Minh"
         result = parse_address(address_str)
         
-        assert result['street_address'] == "789 Hai Bà Trưng"
-        assert result['ward'] == "Phường 3"
-        assert result['district'] == "Quận 3"
-        assert result['province'] == "Thành phố Hồ Chí Minh"
+        assert result.street_address == "789 Hai Bà Trưng"
+        assert result.ward == "Phường 3"
+        assert result.district == "Quận 3"
+        assert result.province == "Thành phố Hồ Chí Minh"

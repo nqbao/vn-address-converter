@@ -20,6 +20,8 @@ pip install vn-address-converter
 
 ## Usage Example
 
+### Basic Address Conversion
+
 ```python
 from vn_address_converter import convert_to_new_address, Address
 
@@ -32,7 +34,34 @@ address = Address(
 
 new_address = convert_to_new_address(address)
 print(new_address)
-# Output: {'street_address': '720A Điện Biên Phủ', 'ward': 'Phường Thạnh Mỹ Tây', 'district': None, 'province': 'Thành phố Hồ Chí Minh'}
+# Output: Address(street_address='720A Điện Biên Phủ', ward='Phường Thạnh Mỹ Tây', district=None, province='Thành phố Hồ Chí Minh')
+
+# Format address as string
+print(new_address.format())
+# Output: 720A Điện Biên Phủ, Phường Thạnh Mỹ Tây, Thành phố Hồ Chí Minh
+```
+
+### Parse Address from String
+
+```python
+from vn_address_converter import parse_address, convert_to_new_address
+
+# Parse address string with different separators
+address_str = "123 Nguyễn Huệ, Phường 1, Quận 1, Thành phố Hồ Chí Minh"
+address = parse_address(address_str)
+print(address)
+# Output: Address(street_address='123 Nguyễn Huệ', ward='Phường 1', district='Quận 1', province='Thành phố Hồ Chí Minh')
+
+# Convert parsed address to new format
+new_address = convert_to_new_address(address)
+print(new_address.format())
+# Output: 123 Nguyễn Huệ, Phường Ben Nghé, Thành phố Hồ Chí Minh
+
+# Works with semicolon, pipe, and hyphen separators too
+address_str = "456 Lê Lợi; Phường 2; Quận 1; Thành phố Hồ Chí Minh"
+address = parse_address(address_str)
+print(address.format())
+# Output: 456 Lê Lợi, Phường 2, Quận 1, Thành phố Hồ Chí Minh
 ```
 
 ## License

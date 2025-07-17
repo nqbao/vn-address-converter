@@ -34,9 +34,11 @@ Vietnam Address Converter is a Python package that converts old Vietnamese addre
 
 ### Core Components
 
-**vn_address_converter/converter.py** - Main conversion logic
-- `Address` TypedDict: Represents Vietnamese addresses with optional fields
+**vn_address_converter/models.py** - Data models
+- `Address` dataclass: Represents Vietnamese addresses with optional fields and `format()` method
 - `AddressLevel` Enum: Defines administrative levels (province, district, ward)
+
+**vn_address_converter/converter.py** - Main conversion logic
 - `convert_to_new_address()`: Main conversion function that maps old addresses to new format
 - `parse_address()`: Parses address strings with support for multiple separators (comma, semicolon, pipe, hyphen)
 - `normalize_alias()`: Normalizes address component names by removing prefixes
@@ -81,7 +83,7 @@ Tests use parametrized pytest with real-world address examples covering:
 ## Important Notes
 
 - The main converter file has a typo in the filename (`convereter.py` instead of `converter.py`)
-- The package uses TypedDict for type safety without runtime overhead
+- The package uses dataclass for the Address model with built-in `format()` method for string conversion
 - All mapping data is stored in JSON format for easy updates
 - The converter returns `district=None` as districts are eliminated in the new format
 - Coverage target is set to 80% minimum

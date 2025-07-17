@@ -2,20 +2,8 @@ import json
 import os
 import re
 import unicodedata
-from typing import TypedDict
-from enum import Enum
 
-# Address TypedDict represents a Vietnamese address with optional fields.
-class Address(TypedDict):
-    street_address: str | None  # Street address (optional)
-    ward: str | None           # Ward/commune name (optional)
-    district: str | None       # District name (optional)
-    province: str | None       # Province/city name (optional)
-
-class AddressLevel(Enum):
-    PROVINCE = 'province'
-    DISTRICT = 'district'
-    WARD = 'ward'
+from .models import Address, AddressLevel
 
 WARD_MAPPING_PATH = os.path.join(os.path.dirname(__file__), 'data', 'ward_mapping.json')
 MANUAL_ALIASES_PATH = os.path.join(os.path.dirname(__file__), 'data', 'manual_aliases.json')
@@ -155,10 +143,10 @@ def parse_address(address_string: str) -> Address:
     )
 
 def convert_to_new_address(address: Address) -> Address:
-    province = address.get('province')
-    district = address.get('district')
-    ward = address.get('ward')
-    street_address = address.get('street_address')
+    province = address.province
+    district = address.district
+    ward = address.ward
+    street_address = address.street_address
 
     if not province or not district or not ward:
         raise ValueError('Missing province, district, or ward in address')
