@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="vn-address-converter",
-    version="0.1.0",
+    version="0.1.1",
     author="Bao Nguyen",
     author_email="qbao.nguyen@gmail.com",
     description="A Python package for converting and normalizing Vietnamese addresses",

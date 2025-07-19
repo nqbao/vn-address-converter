@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vn-address-converter"
-version = "0.1.0"
+version = "0.1.1"
 description = "A Python package for converting and normalizing Vietnamese addresses"
 readme = "README.md"
 authors = [
