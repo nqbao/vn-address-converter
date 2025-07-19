@@ -57,8 +57,18 @@ class TestParseAddress:
     
     def test_parse_address_too_few_components(self):
         """Test parsing address with too few components raises ValueError."""
-        with pytest.raises(ValueError, match="Address must have at least ward, district, and province"):
-            parse_address("Phường 1, Quận 7")
+        with pytest.raises(ValueError, match="Address must have at least district and province"):
+            parse_address("Phường 1")
+    
+    def test_parse_address_two_components(self):
+        """Test parsing address with district and province only."""
+        address_str = "Quận 10, TP Hồ Chí Minh"
+        result = parse_address(address_str)
+        
+        assert result.street_address is None
+        assert result.ward is None
+        assert result.district == "Quận 10"
+        assert result.province == "TP Hồ Chí Minh"
     
     def test_parse_address_too_many_components(self):
         """Test parsing address with too many components combines them into street_address."""
@@ -99,6 +109,12 @@ class TestParseAddress:
         assert result.province == "Hải Dương"
     
     @pytest.mark.parametrize("address_str,expected", [
+        ("Quận 10, TP Hồ Chí Minh", {
+            'street_address': None,
+            'ward': None,
+            'district': "Quận 10",
+            'province': "TP Hồ Chí Minh"
+        }),
         ("Phường 1, Quận 7, Thành phố Hồ Chí Minh", {
             'street_address': None,
             'ward': "Phường 1",

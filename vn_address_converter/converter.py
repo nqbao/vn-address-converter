@@ -3,7 +3,7 @@ import os
 import re
 import unicodedata
 
-from .models import Address, AddressLevel
+from .models import Address, AddressLevel, MappingMissingError
 
 WARD_MAPPING_PATH = os.path.join(os.path.dirname(__file__), 'data', 'ward_mapping.json')
 MANUAL_ALIASES_PATH = os.path.join(os.path.dirname(__file__), 'data', 'manual_aliases.json')
@@ -34,6 +34,36 @@ def normalize_alias(name: str, level: 'AddressLevel') -> str:
     name = re.sub(pattern, '', name, flags=re.IGNORECASE).strip()
     return name.lower()
 
+def get_aliases(name: str, level: 'AddressLevel') -> list[str]:
+    """Return list of aliases for given input name and level.
+    
+    Args:
+        name: The name to generate aliases for
+        level: The administrative level (province, district, ward)
+        
+    Returns:
+        List of aliases including normalized alias, lowercased original name, and accent folded version
+    """
+    aliases = []
+    
+    # Add normalized alias (if not empty)
+    normalized = normalize_alias(name, level)
+    if normalized:
+        aliases.append(normalized)
+    
+    # Add lowercased original name
+    aliases.append(name.lower())
+    
+    # Add accent folded version (after NFC normalization)
+    nfc_normalized = unicodedata.normalize("NFC", name.lower())
+    accent_folded = unicodedata.normalize("NFD", nfc_normalized)
+    accent_folded = ''.join(c for c in accent_folded if unicodedata.category(c) != 'Mn')
+    accent_folded = accent_folded.lower()
+    if accent_folded and accent_folded not in aliases:
+        aliases.append(accent_folded)
+    
+    return aliases
+
 def _get_ward_mapping():
     global WARD_MAPPING
     if WARD_MAPPING is None:
@@ -47,11 +77,9 @@ def _get_ward_mapping():
         ward_aliases = {}
         
         for prov_name, prov_val in mapping.items():
-            prov_alias = normalize_alias(prov_name, AddressLevel.PROVINCE)
-            # Always add normalized alias (if not empty) and lowercased original name
-            if prov_alias:
-                province_aliases[prov_alias] = prov_name
-            province_aliases[prov_name.lower()] = prov_name
+            # Use get_aliases to get all aliases for this province
+            for alias in get_aliases(prov_name, AddressLevel.PROVINCE):
+                province_aliases[alias] = prov_name
             
             # Add manual province aliases
             if prov_name in manual_aliases['provinces']:
@@ -62,9 +90,9 @@ def _get_ward_mapping():
             ward_aliases[prov_name] = {}
             
             for dist_name, dist_val in prov_val.items():
-                dist_alias = normalize_alias(dist_name, AddressLevel.DISTRICT)
-                district_aliases[prov_name][dist_alias] = dist_name
-                district_aliases[prov_name][dist_name.lower()] = dist_name
+                # Use get_aliases to get all aliases for this district
+                for alias in get_aliases(dist_name, AddressLevel.DISTRICT):
+                    district_aliases[prov_name][alias] = dist_name
                 
                 # Add manual district aliases
                 if (prov_name in manual_aliases['districts'] and 
@@ -75,9 +103,9 @@ def _get_ward_mapping():
                 ward_aliases[prov_name][dist_name] = {}
                 
                 for ward_name in dist_val:
-                    ward_alias = normalize_alias(ward_name, AddressLevel.WARD)
-                    ward_aliases[prov_name][dist_name][ward_alias] = ward_name
-                    ward_aliases[prov_name][dist_name][ward_name.lower()] = ward_name
+                    # Use get_aliases to get all aliases for this ward
+                    for alias in get_aliases(ward_name, AddressLevel.WARD):
+                        ward_aliases[prov_name][dist_name][alias] = ward_name
                     
                     # Add manual ward aliases
                     if (prov_name in manual_aliases['wards'] and 
@@ -94,61 +122,6 @@ def _get_ward_mapping():
         }
     return WARD_MAPPING
 
-def parse_address(address_string: str) -> Address:
-    """Parse an address string into components.
-    
-    Args:
-        address_string: Address string separated by comma, semicolon, pipe, or hyphen in format:
-                       "street_address, ward, district, province"
-    
-    Returns:
-        Address: Parsed address with components
-    
-    Raises:
-        ValueError: If address string format is invalid
-    """
-    if not address_string or not address_string.strip():
-        raise ValueError("Address string cannot be empty")
-    
-    # Try different separators in order of preference
-    separators = [',', ';', '|', '-']
-    parts = None
-    
-    for separator in separators:
-        if separator in address_string:
-            parts = [part.strip() for part in address_string.split(separator) if part.strip()]
-            break
-    
-    if parts is None:
-        # No separator found, treat as single component
-        parts = [address_string.strip()]
-
-    if parts[-1] in ("Việt Nam", "Vienam"):
-        # Remove "Việt Nam" if it's the last part
-        parts = parts[:-1]
-    
-    if len(parts) < 3:
-        raise ValueError("Address must have at least ward, district, and province")
-    elif len(parts) == 3:
-        # Format: "ward, district, province"
-        ward, district, province = parts
-        street_address = None
-    elif len(parts) == 4:
-        # Format: "street_address, ward, district, province"
-        street_address, ward, district, province = parts
-    else:
-        # Format: "street_address_part1, street_address_part2, ..., ward, district, province"
-        # Take the last 3 parts as ward, district, province
-        # Combine the rest as street_address
-        ward, district, province = parts[-3:]
-        street_address = ", ".join(parts[:-3])
-    
-    return Address(
-        street_address=street_address if street_address else None,
-        ward=ward if ward else None,
-        district=district if district else None,
-        province=province if province else None
-    )
 
 def convert_to_new_address(address: Address) -> Address:
     province = address.province
@@ -168,19 +141,19 @@ def convert_to_new_address(address: Address) -> Address:
     province_norm = normalize_alias(province, AddressLevel.PROVINCE)
     province_key = province if province in mapping else province_aliases.get(province_norm)
     if not province_key or province_key not in mapping:
-        raise ValueError(f'Province not found in mapping: {province}')
+        raise MappingMissingError(AddressLevel.PROVINCE, province)
     province_map = mapping[province_key]
 
     district_norm = normalize_alias(district, AddressLevel.DISTRICT)
     district_key = district if district in province_map else district_aliases[province_key].get(district_norm)
     if not district_key or district_key not in province_map:
-        raise ValueError(f'District not found in mapping: {district}')
+        raise MappingMissingError(AddressLevel.DISTRICT, district)
     district_map = province_map[district_key]
 
     ward_norm = normalize_alias(ward, AddressLevel.WARD)
     ward_key = ward if ward in district_map else ward_aliases[province_key][district_key].get(ward_norm)
     if not ward_key or ward_key not in district_map:
-        raise ValueError(f'Ward not found in mapping: {ward}')
+        raise MappingMissingError(AddressLevel.WARD, ward)
     ward_map = district_map[ward_key]
 
     new_province = ward_map['new_provine_name']

@@ -9,6 +9,17 @@ class AddressLevel(Enum):
     WARD = 'ward'
 
 
+class MappingMissingError(Exception):
+    """Exception raised when address mapping is missing for a given level and value."""
+    
+    def __init__(self, level: AddressLevel, value: str, message: str = None):
+        self.level = level
+        self.value = value
+        if message is None:
+            message = f'{level.value.capitalize()} not found in mapping: {value}'
+        super().__init__(message)
+
+
 @dataclass
 class Address:
     """Address dataclass represents a Vietnamese address with optional fields."""

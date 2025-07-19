@@ -3,6 +3,7 @@ Basic functionality tests for vn-address-converter.
 """
 from vn_address_converter import convert_to_new_address, Address, AddressLevel
 from vn_address_converter.converter import normalize_alias
+from vn_address_converter.models import MappingMissingError
 import pytest
 import unicodedata
 
@@ -40,6 +41,20 @@ def unicode_equal(str1: str, str2: str) -> bool:
             province="Thành phố Hà Nội"
         )
     ),
+        (
+        Address(
+            street_address="",
+            ward="Phường 8",
+            district="quan 10",
+            province="Thành phố Hồ Chí Minh"
+        ),
+        Address(
+            street_address="",
+            ward="Phường Diên Hồng",
+            district=None,
+            province="Thành phố Hồ Chí Minh"
+        )
+    ),
     (
         # case insensitive ward and district
         Address(
@@ -50,6 +65,21 @@ def unicode_equal(str1: str, str2: str) -> bool:
         ),
         Address(
             street_address="07 Công trường Lam Sơn",
+            ward="Phường Sài Gòn",
+            district=None,
+            province="Thành phố Hồ Chí Minh"
+        )
+    ),
+    (
+        # no accented characters
+        Address(
+            street_address="07 Cong truong Lam Son",
+            ward="phuong ben nghe",
+            district="quan 1",
+            province="thanh pho ho chi minh"
+        ),
+        Address(
+            street_address="07 Cong truong Lam Son",
             ward="Phường Sài Gòn",
             district=None,
             province="Thành phố Hồ Chí Minh"
@@ -126,8 +156,8 @@ def test_convert_address_missing_ward():
 
 
 def test_convert_address_invalid_province():
-    """Test that invalid province raises ValueError"""
-    with pytest.raises(ValueError, match="Province not found in mapping"):
+    """Test that invalid province raises MappingMissingError"""
+    with pytest.raises(MappingMissingError, match="Province not found in mapping"):
         convert_to_new_address(Address(
             street_address="123 Test St",
             ward="Phường 1",
@@ -137,8 +167,8 @@ def test_convert_address_invalid_province():
 
 
 def test_convert_address_invalid_district():
-    """Test that invalid district raises ValueError"""
-    with pytest.raises(ValueError, match="District not found in mapping"):
+    """Test that invalid district raises MappingMissingError"""
+    with pytest.raises(MappingMissingError, match="District not found in mapping"):
         convert_to_new_address(Address(
             street_address="123 Test St",
             ward="Phường 1",
@@ -148,8 +178,8 @@ def test_convert_address_invalid_district():
 
 
 def test_convert_address_invalid_ward():
-    """Test that invalid ward raises ValueError"""
-    with pytest.raises(ValueError, match="Ward not found in mapping"):
+    """Test that invalid ward raises MappingMissingError"""
+    with pytest.raises(MappingMissingError, match="Ward not found in mapping"):
         convert_to_new_address(Address(
             street_address="123 Test St",
             ward="Invalid Ward",
