@@ -82,7 +82,7 @@ Tests use parametrized pytest with real-world address examples covering:
 
 ## Important Notes
 
-- The main converter file has a typo in the filename (`convereter.py` instead of `converter.py`)
+- Never edit tests.csv
 - The package uses dataclass for the Address model with built-in `format()` method for string conversion
 - All mapping data is stored in JSON format for easy updates
 - The converter returns `district=None` as districts are eliminated in the new format

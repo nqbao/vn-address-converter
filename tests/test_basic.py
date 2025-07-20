@@ -70,6 +70,21 @@ def unicode_equal(str1: str, str2: str) -> bool:
             province="Thành phố Hồ Chí Minh"
         )
     ),
+    # Phường 01
+    (
+        Address(
+            street_address="123 Đường Test",
+            ward="Phường 01",
+            district="Quận Gò Vấp",
+            province="Thành phố Hồ Chí Minh"
+        ),
+        Address(
+            street_address="123 Đường Test",
+            ward="Phường Hạnh Thông",
+            district=None,
+            province="Thành phố Hồ Chí Minh"
+        )
+    ),
     (
         # no accented characters
         Address(
@@ -124,7 +139,7 @@ def test_convert_address_table(address, expected):
 # Test error handling cases
 def test_convert_address_missing_province():
     """Test that missing province raises ValueError"""
-    with pytest.raises(ValueError, match="Missing province, district, or ward in address"):
+    with pytest.raises(ValueError, match="Missing province or ward in address"):
         convert_to_new_address(Address(
             street_address="123 Test St",
             ward="Phường 1",
@@ -134,19 +149,28 @@ def test_convert_address_missing_province():
 
 
 def test_convert_address_missing_district():
-    """Test that missing district raises ValueError"""
-    with pytest.raises(ValueError, match="Missing province, district, or ward in address"):
-        convert_to_new_address(Address(
-            street_address="123 Test St",
-            ward="Phường 1",
-            district=None,
-            province="Thành phố Hồ Chí Minh"
-        ))
+    """Test that missing district returns a copy of the original address"""
+    original_address = Address(
+        street_address="123 Test St",
+        ward="Phường 1",
+        district=None,
+        province="Thành phố Hồ Chí Minh"
+    )
+    result = convert_to_new_address(original_address)
+    
+    # Should return a copy of the original address
+    assert result.street_address == original_address.street_address
+    assert result.ward == original_address.ward
+    assert result.district == original_address.district
+    assert result.province == original_address.province
+    
+    # Should be a copy, not the same object
+    assert result is not original_address
 
 
 def test_convert_address_missing_ward():
     """Test that missing ward raises ValueError"""
-    with pytest.raises(ValueError, match="Missing province, district, or ward in address"):
+    with pytest.raises(ValueError, match="Missing province or ward in address"):
         convert_to_new_address(Address(
             street_address="123 Test St",
             ward=None,

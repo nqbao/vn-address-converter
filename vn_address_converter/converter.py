@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 import re
@@ -32,6 +33,11 @@ def normalize_alias(name: str, level: 'AddressLevel') -> str:
     name = unicodedata.normalize("NFC", name)
     pattern = r"^(%s)\s*" % "|".join([re.escape(w) for w in remove_words])  # <-- FIXED: single backslash
     name = re.sub(pattern, '', name, flags=re.IGNORECASE).strip()
+    
+    # Handle leading zeros for numeric wards (e.g., "01" -> "1")
+    if level == AddressLevel.WARD and name.isdigit() and len(name) > 1 and name.startswith('0'):
+        name = str(int(name))
+    
     return name.lower()
 
 def get_aliases(name: str, level: 'AddressLevel') -> list[str]:
@@ -129,8 +135,12 @@ def convert_to_new_address(address: Address) -> Address:
     ward = address.ward
     street_address = address.street_address
 
-    if not province or not district or not ward:
-        raise ValueError('Missing province, district, or ward in address')
+    # If district is missing, this could be a new address format then return as is
+    if not district:
+        return copy.copy(address)
+    
+    if not province or not ward:
+        raise ValueError('Missing province or ward in address')
 
     mapping_obj = _get_ward_mapping()
     mapping = mapping_obj['mapping']

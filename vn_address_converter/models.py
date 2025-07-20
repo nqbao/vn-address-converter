@@ -7,6 +7,7 @@ class AddressLevel(Enum):
     PROVINCE = 'province'
     DISTRICT = 'district'
     WARD = 'ward'
+    STREET = 'street'
 
 
 class MappingMissingError(Exception):

@@ -153,6 +153,84 @@ class TestParseAddress:
         assert hasattr(result, 'district')
         assert hasattr(result, 'province')
     
+    def test_parse_address_heuristic_three_parts(self):
+        """Test heuristic parsing for 3-part addresses with missing components."""
+        
+        # Test: street, district, province (missing ward)
+        address_str = "123 Main Street, Quận 1, Thành phố Hồ Chí Minh"
+        result = parse_address(address_str)
+        
+        assert result.street_address == "123 Main Street"
+        assert result.ward is None
+        assert result.district == "Quận 1"
+        assert result.province == "Thành phố Hồ Chí Minh"
+        
+        # Test: street, ward, province (missing district)
+        address_str = "456 Elm Street, Phường 2, Tỉnh Khánh Hòa"
+        result = parse_address(address_str)
+        
+        assert result.street_address == "456 Elm Street"
+        assert result.ward == "Phường 2"
+        assert result.district is None
+        assert result.province == "Tỉnh Khánh Hòa"
+        
+        # Test: ward, province, street (missing district, different order)
+        address_str = "Phường 3, Tỉnh Đồng Nai, 789 Oak Street"
+        result = parse_address(address_str)
+        
+        assert result.street_address == "789 Oak Street"
+        assert result.ward == "Phường 3"
+        assert result.district is None
+        assert result.province == "Tỉnh Đồng Nai"
+        
+        # Test: district, province, street (missing ward, different order)
+        address_str = "Quận 7, Thành phố Hồ Chí Minh, 321 Pine Street"
+        result = parse_address(address_str)
+        
+        assert result.street_address == "321 Pine Street"
+        assert result.ward is None
+        assert result.district == "Quận 7"
+        assert result.province == "Thành phố Hồ Chí Minh"
+        
+        # Test: traditional format still works (ward, district, province)
+        address_str = "Phường 1, Quận 2, Thành phố Hồ Chí Minh"
+        result = parse_address(address_str)
+        
+        assert result.street_address is None
+        assert result.ward == "Phường 1"
+        assert result.district == "Quận 2"
+        assert result.province == "Thành phố Hồ Chí Minh"
+    
+    def test_parse_address_heuristic_keywords(self):
+        """Test heuristic parsing with various Vietnamese keywords."""
+        
+        # Test with alternative ward keywords
+        address_str = "ABC Building, Xã Tân Phú, Tỉnh Long An"
+        result = parse_address(address_str)
+        
+        assert result.street_address == "ABC Building"
+        assert result.ward == "Xã Tân Phú"
+        assert result.district is None
+        assert result.province == "Tỉnh Long An"
+        
+        # Test with alternative district keywords
+        address_str = "XYZ Complex, Huyện Bình Chánh, Thành phố Hồ Chí Minh"
+        result = parse_address(address_str)
+        
+        assert result.street_address == "XYZ Complex"
+        assert result.ward is None
+        assert result.district == "Huyện Bình Chánh"
+        assert result.province == "Thành phố Hồ Chí Minh"
+        
+        # Test with non-accented keywords
+        address_str = "123 Test St, Phuong 5, Quan 3"
+        result = parse_address(address_str)
+        
+        assert result.street_address == "123 Test St"
+        assert result.ward == "Phuong 5"
+        assert result.district == "Quan 3"
+        assert result.province is None
+
     def test_parse_address_non_standard_formats(self):
         """Test parsing non-standard address formats."""
         # Test with semicolon separator
