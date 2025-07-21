@@ -80,7 +80,7 @@ def parse_address(address_string: str) -> Address:
         # No separator found, treat as single component
         parts = [address_string.strip()]
 
-    if parts[-1] in ("Việt Nam", "Vienam"):
+    if parts[-1].lower() in ("việt nam", "vietnam", "vn"):
         # Remove "Việt Nam" if it's the last part
         parts = parts[:-1]
     

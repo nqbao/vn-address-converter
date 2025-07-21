@@ -27,6 +27,7 @@ def process_csv_file(csv_path: str):
     success_count = 0
     error_count = 0
     copy_count = 0
+    validation_error_count = 0
     
     with open(csv_path, 'r', encoding='utf-8') as file:
         reader = csv.DictReader(file)
@@ -49,6 +50,13 @@ def process_csv_file(csv_path: str):
                 try:
                     converted_address = convert_to_new_address(parsed_address)
                     converted_str = converted_address.format()
+                    
+                    # Validate against expected result
+                    if expected_new_address and converted_str != expected_new_address:
+                        print(f"Row {row_num}: Validation Error - Expected: '{expected_new_address}', Got: '{converted_str}'")
+                        print(f"  Address: {old_address}")
+                        validation_error_count += 1
+                        continue
                     
                     # Check if it's a copy (no district)
                     if converted_address is not parsed_address and all([
@@ -82,9 +90,9 @@ def process_csv_file(csv_path: str):
                 error_count += 1
     
     # Print summary only if there are any results
-    total = success_count + error_count + copy_count
+    total = success_count + error_count + copy_count + validation_error_count
     if total > 0:
-        print(f"\nProcessed {total} addresses: {success_count} converted, {copy_count} copied, {error_count} errors")
+        print(f"\nProcessed {total} addresses: {success_count} converted, {copy_count} copied, {error_count} errors, {validation_error_count} validation failures")
 
 
 if __name__ == "__main__":

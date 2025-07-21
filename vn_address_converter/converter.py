@@ -156,6 +156,15 @@ def convert_to_new_address(address: Address) -> Address:
 
     district_norm = normalize_alias(district, AddressLevel.DISTRICT)
     district_key = district if district in province_map else district_aliases[province_key].get(district_norm)
+
+    # Handle legacy district mapping if available
+    if province_map.get('legacy_district_mapping'):
+        legacy_mapping = province_map['legacy_district_mapping']
+        if district in legacy_mapping:
+            district_key = legacy_mapping[district]
+        elif district_norm in legacy_mapping:
+            district_key = legacy_mapping[district_norm]
+
     if not district_key or district_key not in province_map:
         raise MappingMissingError(AddressLevel.DISTRICT, district)
     district_map = province_map[district_key]
