@@ -174,8 +174,8 @@ class TestParseAddress:
         assert result.district is None
         assert result.province == "Tỉnh Khánh Hòa"
         
-        # Test: ward, province, street (missing district, different order)
-        address_str = "Phường 3, Tỉnh Đồng Nai, 789 Oak Street"
+        # Test: ward, district missing, standard order (street, ward, province)
+        address_str = "789 Oak Street, Phường 3, Tỉnh Đồng Nai"
         result = parse_address(address_str)
         
         assert result.street_address == "789 Oak Street"
@@ -183,8 +183,8 @@ class TestParseAddress:
         assert result.district is None
         assert result.province == "Tỉnh Đồng Nai"
         
-        # Test: district, province, street (missing ward, different order)
-        address_str = "Quận 7, Thành phố Hồ Chí Minh, 321 Pine Street"
+        # Test: ward missing, standard order (street, district, province)
+        address_str = "321 Pine Street, Quận 7, Thành phố Hồ Chí Minh"
         result = parse_address(address_str)
         
         assert result.street_address == "321 Pine Street"
@@ -259,3 +259,23 @@ class TestParseAddress:
         assert result.ward == "Phường 3"
         assert result.district == "Quận 3"
         assert result.province == "Thành phố Hồ Chí Minh"
+
+    def test_parse_address_missing_district_multiple_commas(self):
+        """Test parsing address with missing district but multiple street components."""
+        address_str = "ABC, DEF, Phường Sài Gòn, TP Hồ Chí Minh"
+        result = parse_address(address_str)
+
+        assert result.street_address == "ABC, DEF"
+        assert result.ward == "Phường Sài Gòn"
+        assert result.district is None
+        assert result.province == "TP Hồ Chí Minh"
+
+    def test_parse_address_thanh_pho_district_with_tinh_province(self):
+        """Test parsing address with 'Thành phố' as district when followed by 'Tỉnh' province."""
+        address_str = "123A Đại lộ Đồng Khởi, Phường Phú Tân, Thành phố Bến Tre, Tỉnh Bến Tre"
+        result = parse_address(address_str)
+        
+        assert result.street_address == "123A Đại lộ Đồng Khởi"
+        assert result.ward == "Phường Phú Tân"
+        assert result.district == "Thành phố Bến Tre"
+        assert result.province == "Tỉnh Bến Tre"

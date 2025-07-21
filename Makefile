@@ -65,15 +65,13 @@ install-dev:
 	$(PIP) install -e .[dev]
 	@echo "$(GREEN)Development installation completed!$(NC)"
 
-# Create tests directory if it doesn't exist
-$(TEST_DIR):
-	@mkdir -p $(TEST_DIR)
-	@touch $(TEST_DIR)/__init__.py
-
 # Run tests
-test: $(TEST_DIR)
+test:
 	@echo "$(GREEN)Running tests...$(NC)"
-	pytest $(TEST_DIR) -v;
+	pytest $(TEST_DIR) -v
+
+test_csv:
+	python test_csv_processor.py
 
 streamlit:
 	@echo "$(GREEN)Running Streamlit app...$(NC)"

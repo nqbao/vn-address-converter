@@ -4,7 +4,9 @@ import os
 import re
 import unicodedata
 
+from typing import Union
 from .models import Address, AddressLevel, MappingMissingError
+from .parser import parse_address
 
 WARD_MAPPING_PATH = os.path.join(os.path.dirname(__file__), 'data', 'ward_mapping.json')
 MANUAL_ALIASES_PATH = os.path.join(os.path.dirname(__file__), 'data', 'manual_aliases.json')
@@ -129,7 +131,11 @@ def _get_ward_mapping():
     return WARD_MAPPING
 
 
-def convert_to_new_address(address: Address) -> Address:
+def convert_to_new_address(address: Union[str, Address]) -> Address:
+    # If string is provided, parse it to Address object first
+    if isinstance(address, str):
+        address = parse_address(address)
+    
     province = address.province
     district = address.district
     ward = address.ward
