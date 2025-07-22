@@ -1,6 +1,5 @@
 """Address parsing functionality for Vietnamese addresses."""
 
-import re
 from .models import Address, AddressLevel
 
 
