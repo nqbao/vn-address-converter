@@ -2,7 +2,6 @@
 Basic functionality tests for vn-address-converter.
 """
 from vn_address_converter import convert_to_new_address, Address, AddressLevel
-from vn_address_converter.aliases import normalize_alias
 from vn_address_converter.models import MappingMissingError
 import pytest
 import unicodedata
@@ -210,23 +209,6 @@ def test_convert_address_invalid_ward():
             district="Quận Gò Vấp",
             province="Thành phố Hồ Chí Minh"
         ))
-
-
-# Test normalization functionality
-@pytest.mark.parametrize("input_name,level,expected", [
-    ("Thành phố Hồ Chí Minh", AddressLevel.PROVINCE, "hồ chí minh"),
-    ("Tỉnh Khánh Hòa", AddressLevel.PROVINCE, "khánh hòa"),
-    ("Quận Gò Vấp", AddressLevel.DISTRICT, "gò vấp"),
-    ("Huyện Cần Giờ", AddressLevel.DISTRICT, "cần giờ"),
-    ("Thành phố Thủ Đức", AddressLevel.DISTRICT, "thủ đức"),
-    ("Phường 12", AddressLevel.WARD, "12"),
-    ("Xã Tân Thạnh", AddressLevel.WARD, "tân thạnh"),
-    ("Phường Bến Nghé", AddressLevel.WARD, "bến nghé"),
-])
-def test_normalize_alias(input_name, level, expected):
-    """Test address component normalization"""
-    result = normalize_alias(input_name, level)
-    assert result == expected
 
 
 # Test different province formats and edge cases

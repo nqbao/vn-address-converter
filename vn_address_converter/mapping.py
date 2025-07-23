@@ -4,7 +4,7 @@ import json
 import os
 from typing import Dict, Any, Optional
 from .models import AddressLevel
-from .aliases import get_aliases, normalize_alias
+from .aliases import get_aliases, normalize
 
 
 class WardMapping:
@@ -34,7 +34,7 @@ class DistrictMapping:
     def lookup_ward(self, ward: str) -> Optional[WardMapping]:
         """Get mapping data for a specific ward within this district."""
         
-        ward_norm = normalize_alias(ward, AddressLevel.WARD)
+        ward = normalize(ward, AddressLevel.WARD)
         
         ward_key = None
         ward_data = None
@@ -45,7 +45,7 @@ class DistrictMapping:
             ward_data = self.district_mapping[ward]
         else:
             # Try alias lookup
-            ward_key = self.ward_aliases.get(ward_norm)
+            ward_key = self.ward_aliases.get(ward.lower())
             if ward_key and ward_key in self.district_mapping:
                 ward_data = self.district_mapping[ward_key]
         
@@ -67,7 +67,7 @@ class ProvinceMapping:
     def lookup_district(self, district: str) -> Optional[DistrictMapping]:
         """Get mapping data for a specific district within this province."""
         
-        district_norm = normalize_alias(district, AddressLevel.DISTRICT)
+        district = normalize(district, AddressLevel.DISTRICT)
         
         district_key = None
         district_data = None
@@ -78,7 +78,7 @@ class ProvinceMapping:
             district_data = self.province_mapping[district]
         else:
             # Try alias lookup
-            district_key = self.district_aliases.get(district_norm)
+            district_key = self.district_aliases.get(district.lower())
             if district_key and district_key in self.province_mapping:
                 district_data = self.province_mapping[district_key]
         
@@ -88,8 +88,8 @@ class ProvinceMapping:
             if district in legacy_mapping:
                 district_key = legacy_mapping[district]
                 district_data = self.province_mapping.get(district_key)
-            elif district_norm in legacy_mapping:
-                district_key = legacy_mapping[district_norm]
+            elif district in legacy_mapping:
+                district_key = legacy_mapping[district]
                 district_data = self.province_mapping.get(district_key)
         
         if district_key and district_data:
@@ -188,6 +188,8 @@ class AdministrativeDatabase:
     def lookup_province(self, province: str) -> Optional[ProvinceMapping]:
         """Get mapping data for a specific province."""
         
+        province = normalize(province, AddressLevel.PROVINCE)
+
         mapping_data = self.mapping_data
         mapping = mapping_data['mapping']
         province_aliases = mapping_data['province_aliases']
@@ -202,9 +204,7 @@ class AdministrativeDatabase:
             province_key = province
             province_data = mapping[province]
         else:
-            # Try normalized alias lookup
-            province_norm = normalize_alias(province, AddressLevel.PROVINCE)
-            province_key = province_aliases.get(province_norm)
+            province_key = province_aliases.get(province.lower())
             
             if province_key and province_key in mapping:
                 province_data = mapping[province_key]

@@ -1,8 +1,8 @@
 {
   "Thành phố Hồ Chí Minh": {
     "legacy_district_mapping": {
-      "Quận 9": "Thành phố Thủ Đức",
-      "Quận 2": "Thành phố Thủ Đức"
+      "quận 9": "Thành phố Thủ Đức",
+      "quận 2": "Thành phố Thủ Đức"
     },
     "Quận Gò Vấp": {
       "Phường 12": {
