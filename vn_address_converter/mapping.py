@@ -34,6 +34,7 @@ class DistrictMapping:
     def lookup_ward(self, ward: str) -> Optional[WardMapping]:
         """Get mapping data for a specific ward within this district."""
         
+        original_ward = ward
         ward = normalize(ward, AddressLevel.WARD)
         
         ward_key = None
@@ -44,10 +45,22 @@ class DistrictMapping:
             ward_key = ward
             ward_data = self.district_mapping[ward]
         else:
-            # Try alias lookup
-            ward_key = self.ward_aliases.get(ward.lower())
-            if ward_key and ward_key in self.district_mapping:
-                ward_data = self.district_mapping[ward_key]
+            # Try all possible aliases for this ward
+            from .aliases import get_aliases
+            aliases_to_try = get_aliases(original_ward, AddressLevel.WARD)
+            
+            for alias in aliases_to_try:
+                ward_key = self.ward_aliases.get(alias.lower())
+                if ward_key and ward_key in self.district_mapping:
+                    ward_data = self.district_mapping[ward_key]
+                    break
+        
+        # Handle legacy ward mapping if available
+        if not ward_key and self.district_mapping.get('legacy_ward_mapping'):
+            legacy_mapping = self.district_mapping['legacy_ward_mapping']
+            if ward in legacy_mapping:
+                ward_key = legacy_mapping[ward]
+                ward_data = self.district_mapping.get(ward_key)
         
         if ward_key and ward_data:
             return WardMapping(ward_key=ward_key, ward_data=ward_data)
@@ -67,6 +80,7 @@ class ProvinceMapping:
     def lookup_district(self, district: str) -> Optional[DistrictMapping]:
         """Get mapping data for a specific district within this province."""
         
+        original_district = district
         district = normalize(district, AddressLevel.DISTRICT)
         
         district_key = None
@@ -77,19 +91,25 @@ class ProvinceMapping:
             district_key = district
             district_data = self.province_mapping[district]
         else:
-            # Try alias lookup
-            district_key = self.district_aliases.get(district.lower())
-            if district_key and district_key in self.province_mapping:
-                district_data = self.province_mapping[district_key]
+            # Try all possible aliases for this district
+            from .aliases import get_aliases
+            aliases_to_try = get_aliases(original_district, AddressLevel.DISTRICT)
+            
+            for alias in aliases_to_try:
+                district_key = self.district_aliases.get(alias.lower())
+                if district_key and district_key in self.province_mapping:
+                    district_data = self.province_mapping[district_key]
+                    break
         
         # Handle legacy district mapping if available
-        if not district_key and self.province_mapping.get('legacy_district_mapping'):
+        if not district_data and self.province_mapping.get('legacy_district_mapping'):
             legacy_mapping = self.province_mapping['legacy_district_mapping']
+            # Try both normalized and original district names
             if district in legacy_mapping:
                 district_key = legacy_mapping[district]
                 district_data = self.province_mapping.get(district_key)
-            elif district in legacy_mapping:
-                district_key = legacy_mapping[district]
+            elif original_district in legacy_mapping:
+                district_key = legacy_mapping[original_district]
                 district_data = self.province_mapping.get(district_key)
         
         if district_key and district_data:
@@ -140,9 +160,21 @@ class AdministrativeDatabase:
                 for alias in get_aliases(prov_name, AddressLevel.PROVINCE):
                     province_aliases[alias] = prov_name
                 
-                # Add manual province aliases
-                if prov_name in manual_aliases['provinces']:
-                    for alias in manual_aliases['provinces'][prov_name]:
+                # Add manual province aliases - use case-insensitive lookup
+                manual_prov_aliases = None
+                
+                # Try to find manual aliases with case-insensitive lookup
+                if prov_name in manual_aliases.get('provinces', {}):
+                    manual_prov_aliases = manual_aliases['provinces'][prov_name]
+                else:
+                    # Try case-insensitive province lookup
+                    for manual_prov_name in manual_aliases.get('provinces', {}):
+                        if manual_prov_name.lower() == prov_name.lower():
+                            manual_prov_aliases = manual_aliases['provinces'][manual_prov_name]
+                            break
+                
+                if manual_prov_aliases:
+                    for alias in manual_prov_aliases:
                         province_aliases[alias.lower()] = prov_name
                 
                 district_aliases[prov_name] = {}
@@ -153,10 +185,25 @@ class AdministrativeDatabase:
                     for alias in get_aliases(dist_name, AddressLevel.DISTRICT):
                         district_aliases[prov_name][alias] = dist_name
                     
-                    # Add manual district aliases
-                    if (prov_name in manual_aliases['districts'] and 
-                        dist_name in manual_aliases['districts'][prov_name]):
-                        for alias in manual_aliases['districts'][prov_name][dist_name]:
+                    # Add manual district aliases - use case-insensitive lookup
+                    manual_dist_aliases = None
+                    
+                    # Try to find manual aliases with case-insensitive lookup
+                    if prov_name in manual_aliases.get('districts', {}):
+                        prov_districts = manual_aliases['districts'][prov_name]
+                        
+                        # Try exact match first
+                        if dist_name in prov_districts:
+                            manual_dist_aliases = prov_districts[dist_name]
+                        else:
+                            # Try case-insensitive district lookup
+                            for manual_dist_name in prov_districts:
+                                if manual_dist_name.lower() == dist_name.lower():
+                                    manual_dist_aliases = prov_districts[manual_dist_name]
+                                    break
+                    
+                    if manual_dist_aliases:
+                        for alias in manual_dist_aliases:
                             district_aliases[prov_name][alias.lower()] = dist_name
                     
                     ward_aliases[prov_name][dist_name] = {}
@@ -166,12 +213,39 @@ class AdministrativeDatabase:
                         for alias in get_aliases(ward_name, AddressLevel.WARD):
                             ward_aliases[prov_name][dist_name][alias] = ward_name
                         
-                        # Add manual ward aliases
-                        if (prov_name in manual_aliases['wards'] and 
-                            dist_name in manual_aliases['wards'][prov_name] and
-                            ward_name in manual_aliases['wards'][prov_name][dist_name]):
-                            for alias in manual_aliases['wards'][prov_name][dist_name][ward_name]:
+                        # Add manual ward aliases - use case-insensitive lookup
+                        manual_ward_aliases = None
+                        
+                        # Try to find manual aliases with case-insensitive lookup
+                        if prov_name in manual_aliases.get('wards', {}):
+                            prov_wards = manual_aliases['wards'][prov_name]
+                            
+                            # Try exact match first
+                            if dist_name in prov_wards and ward_name in prov_wards[dist_name]:
+                                manual_ward_aliases = prov_wards[dist_name][ward_name]
+                            else:
+                                # Try case-insensitive district lookup
+                                for manual_dist_name in prov_wards:
+                                    if manual_dist_name.lower() == dist_name.lower():
+                                        if ward_name in prov_wards[manual_dist_name]:
+                                            manual_ward_aliases = prov_wards[manual_dist_name][ward_name]
+                                            break
+                                        else:
+                                            # Try case-insensitive ward lookup within this district
+                                            for manual_ward_name in prov_wards[manual_dist_name]:
+                                                if manual_ward_name.lower() == ward_name.lower():
+                                                    manual_ward_aliases = prov_wards[manual_dist_name][manual_ward_name]
+                                                    break
+                                        if manual_ward_aliases:
+                                            break
+                        
+                        if manual_ward_aliases:
+                            for alias in manual_ward_aliases:
+                                # Add the manual alias itself
                                 ward_aliases[prov_name][dist_name][alias.lower()] = ward_name
+                                # Also add normalized aliases for the manual alias
+                                for normalized_alias in get_aliases(alias, AddressLevel.WARD):
+                                    ward_aliases[prov_name][dist_name][normalized_alias] = ward_name
             
             self._mapping_data = {
                 'mapping': mapping,

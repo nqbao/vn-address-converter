@@ -74,6 +74,10 @@ new_ward = ward_map.get_new_ward()                    # Conversion method
 
 **vn_address_converter/data/** - Mapping data
 - `ward_mapping.json`: Complete hierarchical mapping from old to new administrative divisions
+  1. It's organized by province -> district -> ward
+  2. Each ward has new_provine_name (note the typo) and new_ward_name 
+  3. There's also a legacy_district_mapping section for some districts
+
 - `manual_aliases.json`: Additional manual aliases for edge cases
 
 ### Key Design Patterns

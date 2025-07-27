@@ -339,3 +339,21 @@ def test_manual_aliases():
     assert result3.province == "Thành phố Hồ Chí Minh"
     assert result3.district is None
     assert unicode_equal(result3.ward, "Phường An Hội Tây")
+
+
+def test_convert_address_con_dao():
+    """Test Côn Đảo address conversion
+    
+    This test documents the expected behavior once mapping data is updated.
+    """
+    result = convert_to_new_address(Address(
+        street_address="01A Võ Thị Sáu, Khu dân cư số 6",
+        ward="Thị Trấn Côn Đảo",
+        district="Huyện Côn Đảo", 
+        province="Tỉnh Bà Rịa - Vũng Tàu"
+    ))
+    
+    assert result.street_address == "01A Võ Thị Sáu, Khu dân cư số 6"
+    assert result.district is None  # Districts eliminated in new structure
+    assert result.province == "Thành phố Hồ Chí Minh"
+    assert result.ward == "Đặc khu Côn Đảo"

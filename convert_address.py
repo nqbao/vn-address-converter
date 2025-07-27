@@ -5,7 +5,7 @@ Usage: python convert_address.py "old address string"
 """
 
 import sys
-from vn_address_converter import convert_to_new_address
+from vn_address_converter import convert_to_new_address, parse_address
 
 def main():
     if len(sys.argv) != 2:
@@ -15,6 +15,8 @@ def main():
     old_address = sys.argv[1]
     
     try:
+        old_address = parse_address(old_address)
+        print(f"Converting address: {old_address.format()}")
         new_address = convert_to_new_address(old_address)
         print(new_address.format())
     except Exception as e:

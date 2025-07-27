@@ -2,9 +2,15 @@
   "Thành phố Hồ Chí Minh": {
     "legacy_district_mapping": {
       "quận 9": "Thành phố Thủ Đức",
-      "quận 2": "Thành phố Thủ Đức"
+      "Quận 9": "Thành phố Thủ Đức",
+      "quận 2": "Thành phố Thủ Đức",
+      "Quận 2": "Thành phố Thủ Đức",
+      "quận thủ đức": "Thành phố Thủ Đức"
     },
     "Quận Gò Vấp": {
+      "legacy_ward_mapping": {
+        "phường 9": "Phường 8"
+      },
       "Phường 12": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường An Hội Tây"
@@ -159,6 +165,9 @@
       }
     },
     "Quận 4": {
+      "legacy_ward_mapping": {
+        "phường 6": "Phường 9"
+      },
       "Phường 8": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Khánh Hội"
@@ -385,6 +394,9 @@
       }
     },
     "Quận 5": {
+      "legacy_ward_mapping": {
+        "phường 3": "Phường 2"
+      },
       "Phường 5": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường An Đông"
@@ -427,6 +439,9 @@
       }
     },
     "Quận 3": {
+      "legacy_ward_mapping": {
+        "phường 13": "Phường 12"
+      },
       "Phường 1": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Bàn Cờ"
@@ -531,6 +546,9 @@
       }
     },
     "Quận 6": {
+      "legacy_ward_mapping": {
+        "phường 3": "Phường 1"
+      },
       "Phường 10": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Bình Phú"
@@ -573,6 +591,9 @@
       }
     },
     "Quận 11": {
+      "legacy_ward_mapping": {
+        "phường 2": "Phường 1"
+      },
       "Phường 3": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Bình Thới"
@@ -615,6 +636,14 @@
       }
     },
     "Quận 8": {
+      "legacy_ward_mapping": {
+        "phường 1": "Phường Rạch Ông",
+        "phường 2": "Phường Rạch Ông",
+        "phường 3": "Phường Rạch Ông",
+        "phường 11": "Phường Xóm Củi",
+        "phường 12": "Phường Xóm Củi",
+        "phường 13": "Phường Xóm Củi"
+      },
       "Phường 6": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Bình Đông"
@@ -2686,6 +2715,10 @@
     }
   },
   "Thành phố Hải Phòng": {
+    "legacy_district_mapping": {
+      "Huyện Thuỷ Nguyên": "Thành phố Thuỷ Nguyên",
+      "Huyện An Dương": "Quận An Dương"
+    },
     "Quận Lê Chân": {
       "Phường An Dương": {
         "new_provine_name": "Thành phố Hải Phòng",
@@ -5218,6 +5251,9 @@
     }
   },
   "Thành phố Huế": {
+    "legacy_district_mapping": {
+      "Thành phố Huế": "Quận Thuận Hóa"
+    },
     "Quận Thuận Hóa": {
       "Phường An Đông": {
         "new_provine_name": "Thành phố Huế",
@@ -5975,6 +6011,10 @@
   },
   "Tỉnh Bến Tre": {
     "Thành phố Bến Tre": {
+      "legacy_ward_mapping": {
+        "phường 4": "Phường An Hội",
+        "phường 5": "Phường An Hội"
+      },
       "Phường An Hội": {
         "new_provine_name": "Vĩnh Long",
         "new_ward_name": "Phường An Hội"
@@ -7698,6 +7738,10 @@
     }
   },
   "Tỉnh Bình Dương": {
+    "legacy_district_mapping": {
+      "Thị xã Tân Uyên": "Thành phố Tân Uyên",
+      "Thị xã Bến Cát": "Thành phố Bến Cát"
+    },
     "Thành phố Thuận An": {
       "Phường An Phú": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
@@ -11825,6 +11869,10 @@
         "new_provine_name": "Thành phố Hà Nội",
         "new_ward_name": "Phường Láng"
       },
+      "Phường Ngã Tư Sở": {
+        "new_provine_name": "Thành phố Hà Nội",
+        "new_ward_name": "Phường Láng"
+      },
       "Phường Phương Liên - Trung Tự": {
         "new_provine_name": "Thành phố Hà Nội",
         "new_ward_name": "Phường Văn Miếu - Quốc Tử Giám"
@@ -15358,6 +15406,10 @@
       "Xã Long Phước": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Tam Long"
+      },
+      "Phường Phước Hiệp": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Bà Rịa"
       }
     },
     "Thành phố Phú Mỹ": {
@@ -15400,6 +15452,18 @@
       "Xã Châu Pha": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Xã Châu Pha"
+      },
+      "Thị Trấn Phú Mỹ": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Phú Mỹ"
+      },
+      "Xã Tân Phước": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Tân Phước"
+      },
+      "Xã Tân Hải": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Tân Hải"
       }
     },
     "Thành phố Vũng Tàu": {
@@ -15456,6 +15520,10 @@
         "new_ward_name": "Phường Vũng Tàu"
       },
       "Phường 5": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Vũng Tàu"
+      },
+      "Phường 6": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Vũng Tàu"
       },
@@ -15637,10 +15705,89 @@
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Xã Đất Đỏ"
       }
+    },
+    "Huyện Côn Đảo": {
+      "Thị trấn Côn Đảo": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Đặc khu Côn Đảo"
+      },
+      "Đảo Côn Sơn": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Đặc khu Côn Đảo"
+      }
+    },
+    "Huyện Long Điền": {
+      "Thị trấn Long Điền": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Xã Long Điền"
+      },
+      "Thị trấn Long Hải": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Xã Long Hải"
+      },
+      "Xã An Ngãi": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Xã Long Điền"
+      },
+      "Xã An Nhứt": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Xã Long Điền"
+      },
+      "Xã Phước Hưng": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Xã Long Hải"
+      },
+      "Xã Tam Phước": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Xã Long Điền"
+      },
+      "Xã Phước Tỉnh": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Xã Long Điền"
+      },
+      "058 Phước Tân Phước Tỉnh": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Xã Long Điền"
+      }
+    },
+    "Huyện Đất đỏ": {
+      "Thị trấn Đất Đỏ": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Xã Đất Đỏ"
+      },
+      "Thị trấn Phước Hải": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Xã Phước Hải"
+      },
+      "Xã Lộc An": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Xã Phước Hải"
+      },
+      "Xã Long Mỹ": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Xã Đất Đỏ"
+      }
+    },
+    "Tỉnh Bà Rịa - Vũng Tàu": {
+      "Default": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Bà Rịa - Vũng Tàu (chưa xác định)"
+      },
+      "minato-kv Tokyo 108 Japan": {
+        "new_provine_name": "Foreign",
+        "new_ward_name": "Tokyo, Japan"
+      },
+      "10 Science Park Drive DNV Technology Centre": {
+        "new_provine_name": "Foreign", 
+        "new_ward_name": "Singapore"
+      }
     }
   },
   "Tỉnh Thái Nguyên": {
-    "Thành phố Sông Công": {
+    "legacy_district_mapping": {
+      "Thị xã Phổ Yên": "Thành phố Phổ Yên"
+    },
+    "Thành phố Sống Công": {
       "Xã Bá Xuyên": {
         "new_provine_name": "Thái Nguyên",
         "new_ward_name": "Phường Bá Xuyên"
@@ -17978,6 +18125,9 @@
     }
   },
   "Tỉnh An Giang": {
+    "legacy_district_mapping": {
+      "Huyện Tịnh Biên": "Thị xã Tịnh Biên"
+    },
     "Thành phố Long Xuyên": {
       "Phường Bình Đức": {
         "new_provine_name": "An Giang",
@@ -24658,6 +24808,9 @@
     }
   },
   "Tỉnh Bắc Ninh": {
+    "legacy_district_mapping": {
+      "Thị xã Từ Sơn": "Thành phố Từ Sơn"
+    },
     "Thị xã Quế Võ": {
       "Xã Mộ Đạo": {
         "new_provine_name": "Bắc Ninh",
@@ -30540,6 +30693,9 @@
     }
   },
   "Tỉnh Ninh Bình": {
+    "legacy_district_mapping": {
+      "Thành phố Ninh Bình": "Thành phố Hoa Lư"
+    },
     "Thành phố Hoa Lư": {
       "Phường Ninh Mỹ": {
         "new_provine_name": "Ninh Bình",
