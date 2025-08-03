@@ -4,11 +4,14 @@
       "TP Hồ Chí Minh",
       "TP. Hồ Chí Minh",
       "HCM",
+      "HCMC",
       "Ho Chi Minh City",
       "Sài Gòn",
       "Saigon",
       "TP.HCM",
-      "TPHCM"
+      "TPHCM",
+      "Tp HCM",
+      "TP HCM"
     ],
     "Thành phố Hà Nội": [
       "Hà Nội",
@@ -215,12 +218,29 @@
         "Phường Bến Nghé": [
           "Bến Nghé",
           "Ben Nghe",
-          "P. Bến Nghé"
+          "P. Bến Nghé",
+          "Phường BN"
         ],
         "Phường Bến Thành": [
           "Bến Thành",
           "Ben Thanh",
-          "P. Bến Thành"
+          "P. Bến Thành",
+          "Phường BT"
+        ],
+        "Phường Phạm Ngũ Lão": [
+          "Phường PNL"
+        ],
+        "Phường Nguyễn Thái Bình": [
+          "Phường NTB"
+        ],
+        "Phường Cầu Kho": [
+          "Phường CK"
+        ],
+        "Phường Cô Giang": [
+          "Phường CG"
+        ],
+        "Phường Đa Kao": [
+          "Phường Đakao"
         ]
       },
       "Quận Bình Tân": {
@@ -231,6 +251,9 @@
         "Phường Bình Hưng Hoà B": [
           "Phường Bình Hưng Hòa B",
           "Bình Hưng Hoà B"
+        ],
+        "Phường Bình Hưng Hòa": [
+          "Phường BHH"
         ]
       },
       "Quận Tân Phú": {
@@ -255,19 +278,211 @@
         ]
       },
       "Quận 11": {
-        "Phường 4": [
-          "Phường 4"
-        ],
-        "Phường 12": [
-          "Phường 12"
+        "Phường 1": [
+          "Phường 01"
         ],
         "Phường 2": [
-          "Phường 2"
+          "Phường 02"
+        ],
+        "Phường 3": [
+          "Phường 03"
+        ],
+        "Phường 4": [
+          "Phường 04"
+        ],
+        "Phường 5": [
+          "Phường 05"
+        ],
+        "Phường 7": [
+          "Phường 07"
+        ],
+        "Phường 8": [
+          "Phường 08"
+        ],
+        "Phường 9": [
+          "Phường 09"
+        ],
+        "Phường 10": [
+          "Phường 010"
+        ],
+        "Phường 11": [
+          "Phường 011"
+        ],
+        "Phường 12": [
+          "Phường 012"
+        ],
+        "Phường 14": [
+          "Phường 014"
         ]
       },
       "Quận 6": {
         "Phường 3": [
           "Phường 03"
+        ],
+        "Phường 1": [
+          "Phường 01"
+        ],
+        "Phường 2": [
+          "Phường 02"
+        ],
+        "Phường 4": [
+          "Phường 04"
+        ],
+        "Phường 5": [
+          "Phường 05"
+        ],
+        "Phường 7": [
+          "Phường 07"
+        ],
+        "Phường 8": [
+          "Phường 08"
+        ],
+        "Phường 10": [
+          "Phường 010"
+        ],
+        "Phường 11": [
+          "Phường 011"
+        ]
+      },
+      "Quận 10": {
+        "Phường 1": [
+          "Phường 01"
+        ],
+        "Phường 2": [
+          "Phường 02"
+        ],
+        "Phường 3": [
+          "Phường 03"
+        ],
+        "Phường 4": [
+          "Phường 04"
+        ],
+        "Phường 5": [
+          "Phường 05"
+        ],
+        "Phường 6": [
+          "Phường 06"
+        ],
+        "Phường 7": [
+          "Phường 07"
+        ],
+        "Phường 8": [
+          "Phường 08"
+        ],
+        "Phường 9": [
+          "Phường 09"
+        ],
+        "Phường 10": [
+          "Phường 010"
+        ],
+        "Phường 11": [
+          "Phường 011"
+        ],
+        "Phường 12": [
+          "Phường 012"
+        ],
+        "Phường 13": [
+          "Phường 013"
+        ],
+        "Phường 14": [
+          "Phường 014"
+        ],
+        "Phường 15": [
+          "Phường 015"
+        ]
+      },
+      "Quận Phú Nhuận": {
+        "Phường 1": [
+          "Phường 01"
+        ],
+        "Phường 2": [
+          "Phường 02"
+        ],
+        "Phường 3": [
+          "Phường 03"
+        ],
+        "Phường 4": [
+          "Phường 04"
+        ],
+        "Phường 5": [
+          "Phường 05"
+        ],
+        "Phường 6": [
+          "Phường 06"
+        ],
+        "Phường 7": [
+          "Phường 07"
+        ],
+        "Phường 8": [
+          "Phường 08"
+        ],
+        "Phường 9": [
+          "Phường 09"
+        ],
+        "Phường 10": [
+          "Phường 010"
+        ],
+        "Phường 11": [
+          "Phường 011"
+        ],
+        "Phường 13": [
+          "Phường 013"
+        ],
+        "Phường 14": [
+          "Phường 014"
+        ],
+        "Phường 15": [
+          "Phường 015"
+        ],
+        "Phường 17": [
+          "Phường 017"
+        ]
+      },
+      "Quận 5": {
+        "Phường 1": [
+          "Phường 01"
+        ],
+        "Phường 2": [
+          "Phường 02"
+        ],
+        "Phường 3": [
+          "Phường 03"
+        ],
+        "Phường 4": [
+          "Phường 04"
+        ],
+        "Phường 5": [
+          "Phường 05"
+        ],
+        "Phường 6": [
+          "Phường 06"
+        ],
+        "Phường 7": [
+          "Phường 07"
+        ],
+        "Phường 8": [
+          "Phường 08"
+        ],
+        "Phường 9": [
+          "Phường 09"
+        ],
+        "Phường 10": [
+          "Phường 010"
+        ],
+        "Phường 11": [
+          "Phường 011"
+        ],
+        "Phường 12": [
+          "Phường 012"
+        ],
+        "Phường 13": [
+          "Phường 013"
+        ],
+        "Phường 14": [
+          "Phường 014"
+        ],
+        "Phường 15": [
+          "Phường 015"
         ]
       },
       "Quận Bình Thạnh": {

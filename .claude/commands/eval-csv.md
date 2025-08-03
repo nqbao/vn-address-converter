@@ -6,8 +6,9 @@ Please follow the below instructions
 - For missing mapping:
   - if it is "hoà" vs "hòa" then try to fix it via manual aliases
   - Try to do web search to find the info, usually the mapping is posted on thuvienphapluat.vn
-  - You can use the website vnpost to check what is the right result, then edit the ward mapping to add it
+  - You can use vn-address-researcher to look up result from website to check what is the right result, then edit the ward mapping to add it
   - If it is a legacy mapping, use "legacy_district_mapping" or "legacy_ward_mapping"
+  - The "Phường 08" vs "Phường 8" is already solved by normalizer
 - Never add a street address to the manual aliases
 - If you stuck in the loop, just yield back to user to control
 - Run `make test` at the end to make sure nothing is broken

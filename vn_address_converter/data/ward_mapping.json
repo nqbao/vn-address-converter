@@ -9,7 +9,8 @@
     },
     "Quận Gò Vấp": {
       "legacy_ward_mapping": {
-        "phường 9": "Phường 8"
+        "phường 9": "Phường 8",
+        "phường 13": "Phường 15"
       },
       "Phường 12": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
@@ -51,6 +52,10 @@
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Hạnh Thông"
       },
+      "Phường 4": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Hạnh Thông"
+      },
       "Phường 8": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Thông Tây Hội"
@@ -58,6 +63,10 @@
       "Phường 11": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Thông Tây Hội"
+      },
+      "Phường 7": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Hạnh Thông"
       }
     },
     "Quận Bình Tân": {
@@ -166,7 +175,10 @@
     },
     "Quận 4": {
       "legacy_ward_mapping": {
-        "phường 6": "Phường 9"
+        "phường 6": "Phường 9",
+        "phường 10": "Phường 8",
+        "phường 12": "Phường 13",
+        "phường 14": "Phường 15"
       },
       "Phường 8": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
@@ -395,7 +407,10 @@
     },
     "Quận 5": {
       "legacy_ward_mapping": {
-        "phường 3": "Phường 2"
+        "phường 3": "Phường 2",
+        "phường 6": "Phường 5",
+        "phường 8": "Phường 7",
+        "phường 10": "Phường 11"
       },
       "Phường 5": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
@@ -466,6 +481,10 @@
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Nhiêu Lộc"
       },
+      "Phường 10": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Nhiêu Lộc"
+      },
       "Phường 11": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Nhiêu Lộc"
@@ -484,6 +503,10 @@
       }
     },
     "Quận Bình Thạnh": {
+      "legacy_ward_mapping": {
+        "phường 21": "Phường 19",
+        "phường 6": "Phường 5"
+      },
       "Phường 5": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Bình Lợi Trung"
@@ -524,6 +547,14 @@
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Gia Định"
       },
+      "Phường 3": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Gia Định"
+      },
+      "Phường 15": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Gia Định"
+      },
       "Phường 7": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Gia Định"
@@ -547,7 +578,9 @@
     },
     "Quận 6": {
       "legacy_ward_mapping": {
-        "phường 3": "Phường 1"
+        "phường 3": "Phường 1",
+        "phường 4": "Phường 1",
+        "phường 6": "Phường 2"
       },
       "Phường 10": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
@@ -588,11 +621,17 @@
       "Phường 14": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Phú Lâm"
+      },
+      "Phường 5": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Bình Tiên"
       }
     },
     "Quận 11": {
       "legacy_ward_mapping": {
-        "phường 2": "Phường 1"
+        "phường 2": "Phường 1",
+        "phường 4": "Phường 7",
+        "phường 6": "Phường 7"
       },
       "Phường 3": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
@@ -633,6 +672,18 @@
       "Phường 15": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Phú Thọ"
+      },
+      "Phường 9": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Bình Thới"
+      },
+      "Phường 12": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Phú Thọ"
+      },
+      "Phường 13": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Hòa Bình"
       }
     },
     "Quận 8": {
@@ -640,6 +691,9 @@
         "phường 1": "Phường Rạch Ông",
         "phường 2": "Phường Rạch Ông",
         "phường 3": "Phường Rạch Ông",
+        "phường 8": "Phường Hưng Phú",
+        "phường 9": "Phường Hưng Phú",
+        "phường 10": "Phường Hưng Phú",
         "phường 11": "Phường Xóm Củi",
         "phường 12": "Phường Xóm Củi",
         "phường 13": "Phường Xóm Củi"
@@ -728,6 +782,9 @@
       }
     },
     "Quận Phú Nhuận": {
+      "legacy_ward_mapping": {
+        "phường 14": "Phường 13"
+      },
       "Phường 1": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Cầu Kiệu"
@@ -743,6 +800,10 @@
       "Phường 15": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Cầu Kiệu"
+      },
+      "Phường 3": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Đức Nhuận"
       },
       "Phường 8": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
@@ -771,9 +832,21 @@
       "Phường 9": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Đức Nhuận"
+      },
+      "Phường 17": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Cầu Kiệu"
+      },
+      "Phường 12": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Phú Nhuận"
       }
     },
     "Quận 10": {
+      "legacy_ward_mapping": {
+        "phường 3": "Phường 2",
+        "phường 7": "Phường 6"
+      },
       "Phường 6": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Diên Hồng"
@@ -817,6 +890,14 @@
       "Phường 10": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Phường Vườn Lài"
+      },
+      "Phường 5": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Vườn Lài"
+      },
+      "Phường 11": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Hòa Hưng"
       }
     },
     "Quận 7": {
@@ -1089,6 +1170,10 @@
       "Xã Bình Hưng": {
         "new_provine_name": "Thành phố Hồ Chí Minh",
         "new_ward_name": "Xã Bình Hưng"
+      },
+      "Xã Bình Trị Đông": {
+        "new_provine_name": "Thành phố Hồ Chí Minh",
+        "new_ward_name": "Phường Bình Trị Đông"
       },
       "Xã Phong Phú": {
         "new_provine_name": "Thành phố Hồ Chí Minh",

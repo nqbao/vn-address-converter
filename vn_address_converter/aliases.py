@@ -97,7 +97,7 @@ def get_aliases(name: str, level: 'AddressLevel') -> list[str]:
         normalized = re.sub(r'^(tỉnh|thành phố)\s*', '', normalized, flags=re.IGNORECASE).strip()
     elif level == AddressLevel.DISTRICT:
         # Special case for districts: remove "thành phố" or "TP" prefix if present
-        normalized = re.sub(r'^(thành phố|tp\.?|quận|huyện)\s*', '', normalized, flags=re.IGNORECASE).strip()
+        normalized = re.sub(r'^(thành phố|tp\.?|quận|huyện|thị xã|tx\.?)\s*', '', normalized, flags=re.IGNORECASE).strip()
     elif level == AddressLevel.WARD:
         # Special case for wards: remove "phường" or "xã" prefix if present
         normalized = re.sub(r'^(phường|xã)\s*', '', normalized, flags=re.IGNORECASE).strip()

@@ -91,7 +91,7 @@ def _detect_component_type_with_context(part: str, parts: list, original_parts: 
             return AddressLevel.PROVINCE
     
     # District keywords (check after thành phố logic, remove 'tp' since it's handled above)
-    district_keywords = ['quận', 'quan', 'huyện', 'huyen', 'thị xã', 'thi xa']
+    district_keywords = ['quận', 'quan', 'huyện', 'huyen', 'thị xã', 'thi xa', 'tx', 'tx.']
     for keyword in district_keywords:
         if part_lower.startswith(keyword):
             return AddressLevel.DISTRICT
@@ -332,11 +332,56 @@ def parse_address(address_string: str) -> Address:
             # Default fallback: assume street_address, ward, district, province
             street_address, ward, district, province = parts
     else:
-        # Format: "street_address_part1, street_address_part2, ..., ward, district, province"
-        # Take the last 3 parts as ward, district, province
-        # Combine the rest as street_address
-        ward, district, province = parts[-3:]
-        street_address = ", ".join(parts[:-3])
+        # Format: >4 parts - use heuristics to detect components
+        types = [_detect_component_type_with_context(part, parts, original_parts) for part in parts]
+        
+        # Initialize all variables
+        street_address = None
+        ward = None
+        district = None
+        province = None
+        
+        # Apply heuristics based on detected types
+        if AddressLevel.WARD in types and AddressLevel.DISTRICT in types and AddressLevel.PROVINCE in types:
+            # Full address with all components
+            ward = parts[types.index(AddressLevel.WARD)]
+            district = parts[types.index(AddressLevel.DISTRICT)]
+            province = parts[types.index(AddressLevel.PROVINCE)]
+            # Combine all non-administrative parts as street address
+            street_parts = []
+            for i, part in enumerate(parts):
+                if types[i] not in [AddressLevel.WARD, AddressLevel.DISTRICT, AddressLevel.PROVINCE]:
+                    street_parts.append(part)
+            if street_parts:
+                street_address = ", ".join(street_parts)
+        elif AddressLevel.WARD in types and AddressLevel.PROVINCE in types:
+            # Missing district - ward and province detected
+            ward = parts[types.index(AddressLevel.WARD)]
+            province = parts[types.index(AddressLevel.PROVINCE)]
+            # Combine all non-ward, non-province parts as street address
+            street_parts = []
+            for i, part in enumerate(parts):
+                if types[i] not in [AddressLevel.WARD, AddressLevel.PROVINCE]:
+                    street_parts.append(part)
+            if street_parts:
+                street_address = ", ".join(street_parts)
+        elif AddressLevel.DISTRICT in types and AddressLevel.PROVINCE in types:
+            # Missing ward - district and province detected
+            district = parts[types.index(AddressLevel.DISTRICT)]
+            province = parts[types.index(AddressLevel.PROVINCE)]
+            # Combine all non-district, non-province parts as street address
+            street_parts = []
+            for i, part in enumerate(parts):
+                if types[i] not in [AddressLevel.DISTRICT, AddressLevel.PROVINCE]:
+                    street_parts.append(part)
+            if street_parts:
+                street_address = ", ".join(street_parts)
+        else:
+            # Fallback: assume the last 3 parts are ward, district, province
+            # Take the last 3 parts as ward, district, province
+            # Combine the rest as street_address
+            ward, district, province = parts[-3:]
+            street_address = ", ".join(parts[:-3])
     
     # Extract embedded ward information from street address if not explicitly provided
     if street_address and ward is None:
