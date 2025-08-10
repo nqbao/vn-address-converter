@@ -44,6 +44,9 @@ class DistrictMapping:
         if ward in self.district_mapping:
             ward_key = ward
             ward_data = self.district_mapping[ward]
+        elif ward in self.ward_aliases:
+            ward_key = self.ward_aliases[ward]
+            ward_data = self.district_mapping.get(ward_key)
         else:
             # Try all possible aliases for this ward
             from .aliases import get_aliases
@@ -90,6 +93,9 @@ class ProvinceMapping:
         if district in self.province_mapping:
             district_key = district
             district_data = self.province_mapping[district]
+        elif district in self.district_aliases:
+            district_key = self.district_aliases[district]
+            district_data = self.province_mapping.get(district_key)
         else:
             # Try all possible aliases for this district
             from .aliases import get_aliases

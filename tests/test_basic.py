@@ -129,6 +129,21 @@ def unicode_equal(str1: str, str2: str) -> bool:
             province="Thành phố Hồ Chí Minh"
         )
     ),
+    (
+        # Test H. and X. prefixes
+        Address(
+            street_address="1/17 Nguyễn Văn Bứa",
+            ward="X. Xuân Thới Sơn",
+            district="H. Hóc Môn",
+            province="TP. Hồ Chí Minh"
+        ),
+        Address(
+            street_address="1/17 Nguyễn Văn Bứa",
+            ward="Xã Xuân Thới Sơn",
+            district=None,
+            province="Thành phố Hồ Chí Minh"
+        )
+    ),
 ])
 def test_convert_address_table(address, expected):
     result = convert_to_new_address(address)

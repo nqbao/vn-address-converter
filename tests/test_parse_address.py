@@ -132,6 +132,12 @@ class TestParseAddress:
             'ward': "Phường 12",
             'district': "Quận Gò Vấp",
             'province': "Thành phố Hồ Chí Minh"
+        }),
+        ("1/17 Nguyễn Văn Bứa, X. Xuân Thới Sơn, H. Hóc Môn, TP. Hồ Chí Minh, Việt Nam", {
+            'street_address': "1/17 Nguyễn Văn Bứa",
+            'ward': "X. Xuân Thới Sơn",
+            'district': "H. Hóc Môn",
+            'province': "TP. Hồ Chí Minh"
         })
     ])
     def test_parse_address_parametrized(self, address_str, expected):

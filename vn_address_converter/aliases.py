@@ -3,17 +3,18 @@
 import re
 import unicodedata
 from .models import AddressLevel
+from .utils import accent_fold
 
 
 def normalize(name: str, level: 'AddressLevel') -> str:
-    """Normalize address component name by removing administrative prefixes.
+    """Normalize the given address name based on its level.
     
     Args:
-        name: The address component name to normalize
+        name: The name to normalize
         level: The administrative level (province, district, ward)
         
     Returns:
-        Normalized lowercase name with prefixes removed
+        Normalized name as a lowercase string
     """
     name = name.strip()
     name = unicodedata.normalize("NFC", name)
@@ -23,15 +24,20 @@ def normalize(name: str, level: 'AddressLevel') -> str:
     if level in (AddressLevel.DISTRICT, AddressLevel.WARD):
         name = re.sub(r'\([^)]*\)', '', name).strip()
 
+    if level == AddressLevel.PROVINCE:
+        name = re.sub(r'\s*province\s*$', '', name, flags=re.IGNORECASE).strip()
     if level == AddressLevel.DISTRICT:
         # Normalize district numbers (e.g., "quận 01" -> "quận 1")
         name = re.sub(r'\b0+(\d+)\b', r'\1', name)
+        name = re.sub(r'\bdistrict\s*', '', name, flags=re.IGNORECASE)
     elif level == AddressLevel.WARD:
         # Normalize ward numbers (e.g., "phường 01" -> "phường 1")
         name = re.sub(r'\b0+(\d+)\b', r'\1', name)
-        
+        name = re.sub(r'\bward\s*', '', name, flags=re.IGNORECASE)
+        name = re.sub(r'\bcommunes?\s*', '', name, flags=re.IGNORECASE)
+
     
-    return name.lower()
+    return name.strip().lower()
 
 
 def _normalize_vietnamese_phonetics(text: str) -> list[str]:
@@ -97,13 +103,17 @@ def get_aliases(name: str, level: 'AddressLevel') -> list[str]:
         normalized = re.sub(r'^(tỉnh|thành phố)\s*', '', normalized, flags=re.IGNORECASE).strip()
     elif level == AddressLevel.DISTRICT:
         # Special case for districts: remove "thành phố" or "TP" prefix if present
-        normalized = re.sub(r'^(thành phố|tp\.?|quận|huyện|thị xã|tx\.?)\s*', '', normalized, flags=re.IGNORECASE).strip()
+        normalized = re.sub(r'^(thành phố|tp\.?|quận|huyện|thị xã|tx\.?|h\.?|x\.?)\s*', '', normalized, flags=re.IGNORECASE).strip()
     elif level == AddressLevel.WARD:
         # Special case for wards: remove "phường" or "xã" prefix if present
-        normalized = re.sub(r'^(phường|xã)\s*', '', normalized, flags=re.IGNORECASE).strip()
+        normalized = re.sub(r'^(phường|xã|x\.?)\s*', '', normalized, flags=re.IGNORECASE).strip()
 
     if normalized not in aliases:
         aliases.append(normalized)
+        # add accent folded version
+        accent_folded = accent_fold(normalized)
+        if accent_folded and accent_folded not in aliases:
+            aliases.append(accent_folded)
     
     # Generate phonetic variants for normalized form too
     normalized_variants = _normalize_vietnamese_phonetics(normalized)
@@ -146,11 +156,8 @@ def get_aliases(name: str, level: 'AddressLevel') -> list[str]:
                     aliases.append(abbr_upper)
     
     # Add accent folded version (after NFC normalization)
-    nfc_normalized = unicodedata.normalize("NFC", name.lower())
-    accent_folded = unicodedata.normalize("NFD", nfc_normalized)
-    accent_folded = ''.join(c for c in accent_folded if unicodedata.category(c) != 'Mn')
-    accent_folded = accent_folded.lower()
-    if accent_folded and accent_folded not in aliases:
-        aliases.append(accent_folded)
+    accent_folded_final = accent_fold(name.lower())
+    if accent_folded_final and accent_folded_final not in aliases:
+        aliases.append(accent_folded_final)
     
     return aliases

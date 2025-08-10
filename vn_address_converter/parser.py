@@ -79,22 +79,28 @@ def _detect_component_type_with_context(part: str, parts: list, original_parts: 
     part_lower = part.lower().strip()
     
     # Ward keywords
-    ward_keywords = ['phường', 'phuong', 'xã', 'xa', 'thị trấn', 'thi tran']
+    ward_keywords = ['phường', 'phuong', 'xã', 'xa', 'x.', 'thị trấn', 'thi tran']
     for keyword in ward_keywords:
         if part_lower.startswith(keyword):
             return AddressLevel.WARD
+    if part_lower.endswith("ward") or part_lower.endswith("commune"):
+        return AddressLevel.WARD
     
     # Province keywords (check first to prioritize over district keywords)
     province_keywords = ['tỉnh', 'tinh']
     for keyword in province_keywords:
         if part_lower.startswith(keyword):
             return AddressLevel.PROVINCE
+    if part_lower.endswith("province"):
+        return AddressLevel.PROVINCE
     
     # District keywords (check after thành phố logic, remove 'tp' since it's handled above)
-    district_keywords = ['quận', 'quan', 'huyện', 'huyen', 'thị xã', 'thi xa', 'tx', 'tx.']
+    district_keywords = ['quận', 'quan', 'huyện', 'huyen', 'h.', 'thị xã', 'thi xa', 'tx', 'tx.']
     for keyword in district_keywords:
         if part_lower.startswith(keyword):
             return AddressLevel.DISTRICT
+    if part_lower.endswith("district"):
+        return AddressLevel.DISTRICT
 
     # For "thành phố" - need to distinguish between province-level cities and district-level
     if part_lower.startswith('thành phố') or part_lower.startswith('thanh pho') \
@@ -121,7 +127,7 @@ def _detect_component_type_with_context(part: str, parts: list, original_parts: 
     
     if not has_tinh:  # Only apply this heuristic when no Tỉnh is detected in the address
         # If we have a district in the parts and this is the last part, assume it's province
-        has_district = any(p.lower().startswith(('quận', 'quan', 'huyện', 'huyen', 'thị xã', 'thi xa')) for p in check_parts)
+        has_district = any(p.lower().startswith(('quận', 'quan', 'huyện', 'huyen', 'h.', 'thị xã', 'thi xa')) for p in check_parts)
         if has_district and check_parts and part == check_parts[-1]:
             return AddressLevel.PROVINCE
 
@@ -389,9 +395,11 @@ def parse_address(address_string: str) -> Address:
         if extracted_ward:
             ward = extracted_ward
     
-    return Address(
+    final = Address(
         street_address=street_address if street_address else None,
         ward=ward if ward else None,
         district=district if district else None,
         province=province if province else None
     )
+
+    return final
