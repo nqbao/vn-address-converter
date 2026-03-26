@@ -21,6 +21,19 @@ def _get_manual_aliases():
             MANUAL_ALIASES = {"provinces": {}, "districts": {}, "wards": {}}
     return MANUAL_ALIASES
 
+_APOSTROPHE_CHARS = '\u2019\u2018\u02bc\u0060\u00b4\uff07'
+_APOSTROPHE_TABLE = str.maketrans(_APOSTROPHE_CHARS, "'" * len(_APOSTROPHE_CHARS))
+
+
+def _normalize_apostrophes(name: str) -> str:
+    return name.translate(_APOSTROPHE_TABLE)
+
+
+def _accent_fold(s: str) -> str:
+    nfd = unicodedata.normalize("NFD", unicodedata.normalize("NFC", s))
+    return ''.join(c for c in nfd if unicodedata.category(c) != 'Mn').lower()
+
+
 def normalize_alias(name: str, level: 'AddressLevel') -> str:
     if level == AddressLevel.PROVINCE:
         remove_words = ['thành phố', 'tỉnh']
@@ -31,13 +44,14 @@ def normalize_alias(name: str, level: 'AddressLevel') -> str:
     else:
         remove_words = []
     name = unicodedata.normalize("NFC", name)
+    name = _normalize_apostrophes(name)
     pattern = r"^(%s)\s*" % "|".join([re.escape(w) for w in remove_words])  # <-- FIXED: single backslash
     name = re.sub(pattern, '', name, flags=re.IGNORECASE).strip()
-    
+
     # Handle leading zeros for numeric wards (e.g., "01" -> "1")
     if level == AddressLevel.WARD and name.isdigit() and len(name) > 1 and name.startswith('0'):
         name = str(int(name))
-    
+
     return name.lower()
 
 def get_aliases(name: str, level: 'AddressLevel') -> list[str]:
@@ -67,7 +81,13 @@ def get_aliases(name: str, level: 'AddressLevel') -> list[str]:
     accent_folded = accent_folded.lower()
     if accent_folded and accent_folded not in aliases:
         aliases.append(accent_folded)
-    
+
+    # Add accent-folded version of normalized alias (without prefix)
+    if normalized:
+        normalized_folded = _accent_fold(normalized)
+        if normalized_folded and normalized_folded not in aliases:
+            aliases.append(normalized_folded)
+
     return aliases
 
 def _get_ward_mapping():
@@ -149,19 +169,25 @@ def convert_to_new_address(address: Address) -> Address:
     ward_aliases = mapping_obj['ward_aliases']
 
     province_norm = normalize_alias(province, AddressLevel.PROVINCE)
-    province_key = province if province in mapping else province_aliases.get(province_norm)
+    province_key = (province if province in mapping
+                    else province_aliases.get(province_norm)
+                    or province_aliases.get(_accent_fold(province_norm)))
     if not province_key or province_key not in mapping:
         raise MappingMissingError(AddressLevel.PROVINCE, province)
     province_map = mapping[province_key]
 
     district_norm = normalize_alias(district, AddressLevel.DISTRICT)
-    district_key = district if district in province_map else district_aliases[province_key].get(district_norm)
+    district_key = (district if district in province_map
+                    else district_aliases[province_key].get(district_norm)
+                    or district_aliases[province_key].get(_accent_fold(district_norm)))
     if not district_key or district_key not in province_map:
         raise MappingMissingError(AddressLevel.DISTRICT, district)
     district_map = province_map[district_key]
 
     ward_norm = normalize_alias(ward, AddressLevel.WARD)
-    ward_key = ward if ward in district_map else ward_aliases[province_key][district_key].get(ward_norm)
+    ward_key = (ward if ward in district_map
+                else ward_aliases[province_key][district_key].get(ward_norm)
+                or ward_aliases[province_key][district_key].get(_accent_fold(ward_norm)))
     if not ward_key or ward_key not in district_map:
         raise MappingMissingError(AddressLevel.WARD, ward)
     ward_map = district_map[ward_key]
