@@ -357,3 +357,54 @@ def test_manual_aliases():
     assert result3.province == "Thành phố Hồ Chí Minh"
     assert result3.district is None
     assert unicode_equal(result3.ward, "Phường An Hội Tây")
+
+
+def test_hoa_binh_correct_spelling():
+    """Test Hòa Bình province with correct spelling (accent on o)"""
+    result = convert_to_new_address(Address(
+        street_address="123 Test",
+        ward="Phường Đồng Tiến",
+        district="Thành phố Hòa Bình",
+        province="Tỉnh Hòa Bình"
+    ))
+    assert result.district is None
+    assert result.province == "Phú Thọ"
+    assert result.ward == "Phường Hòa Bình"
+
+
+def test_hoa_binh_old_spelling():
+    """Test Hòa Bình province with old/incorrect spelling (accent on a) still resolves via accent-fold"""
+    result = convert_to_new_address(Address(
+        street_address="123 Test",
+        ward="Phường Đồng Tiến",
+        district="Thành phố Hòa Bình",
+        province="Tỉnh Hoà Bình"  # old spelling: accent on 'a' instead of 'o'
+    ))
+    assert result.district is None
+    assert result.province == "Phú Thọ"
+
+
+def test_apostrophe_curly_in_district():
+    """Test district names with curly apostrophe (U+2019) are normalized correctly"""
+    result = convert_to_new_address(Address(
+        street_address="134 Hùng Vương",
+        ward="Thị trấn Quảng Phú",
+        district="Huyện Cư M\u2019gar",  # curly apostrophe U+2019
+        province="Tỉnh Đắk Lắk"
+    ))
+    assert result.district is None
+    assert result.province == "Đắk Lắk"
+    assert result.ward == "Xã Quảng Phú"
+
+
+def test_apostrophe_straight_in_district():
+    """Test district names with straight apostrophe (U+0027) work correctly"""
+    result = convert_to_new_address(Address(
+        street_address="134 Hùng Vương",
+        ward="Thị trấn Quảng Phú",
+        district="Huyện Cư M'gar",  # straight apostrophe U+0027
+        province="Tỉnh Đắk Lắk"
+    ))
+    assert result.district is None
+    assert result.province == "Đắk Lắk"
+    assert result.ward == "Xã Quảng Phú"
