@@ -1,6 +1,7 @@
 """Address parsing functionality for Vietnamese addresses."""
 
 import re
+import unicodedata
 from .models import Address, AddressLevel
 
 
@@ -66,6 +67,10 @@ def parse_address(address_string: str) -> Address:
     """
     if not address_string or not address_string.strip():
         raise ValueError("Address string cannot be empty")
+
+    # Normalize Unicode to NFC so that keyword matching works consistently
+    # regardless of whether input is composed (NFC) or decomposed (NFD)
+    address_string = unicodedata.normalize("NFC", address_string)
 
     # Normalize newlines to commas so copy-pasted multi-line addresses parse correctly
     address_string = address_string.replace('\r\n', ', ').replace('\r', ', ').replace('\n', ', ')

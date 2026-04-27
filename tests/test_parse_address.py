@@ -367,3 +367,60 @@ class TestParseAddress:
         assert result.ward == expected['ward']
         assert result.district == expected['district']
         assert result.province == expected['province']
+
+    @pytest.mark.parametrize("address_str,expected", [
+        # NFD decomposed input: basic 3-part (macOS-style decomposed Unicode)
+        ("Phu\u031bo\u031b\u0300ng 1, Qua\u0323\u0302n 7, Tha\u0300nh pho\u0302\u0301 Ho\u0302\u0300 Chi\u0301 Minh", {
+            'street_address': None,
+            'ward': "Phường 1",
+            'district': "Quận 7",
+            'province': "Thành phố Hồ Chí Minh"
+        }),
+        # NFD input: 4-part with street
+        ("123 Nguye\u0302\u0303n Tra\u0303i, Phu\u031bo\u031b\u0300ng 2, Qua\u0323\u0302n 1, Tha\u0300nh pho\u0302\u0301 Ho\u0302\u0300 Chi\u0301 Minh", {
+            'street_address': "123 Nguyễn Trãi",
+            'ward': "Phường 2",
+            'district': "Quận 1",
+            'province': "Thành phố Hồ Chí Minh"
+        }),
+        # NFD input: Thị xã district
+        ("Phu\u031bo\u031b\u0300ng Ninh Giang, Thi\u0323 xa\u0303 Ninh Ho\u0300a, Ti\u0309nh Kha\u0301nh Ho\u0300a", {
+            'street_address': None,
+            'ward': "Phường Ninh Giang",
+            'district': "Thị xã Ninh Hòa",
+            'province': "Tỉnh Khánh Hòa"
+        }),
+        # NFD input: Việt Nam suffix should be stripped
+        ("Phu\u031bo\u031b\u0300ng 1, Qua\u0323\u0302n 7, Tha\u0300nh pho\u0302\u0301 Ho\u0302\u0300 Chi\u0301 Minh, Vie\u0323\u0302t Nam", {
+            'street_address': None,
+            'ward': "Phường 1",
+            'district': "Quận 7",
+            'province': "Thành phố Hồ Chí Minh"
+        }),
+        # NFD input: reversed order (heuristic must still work)
+        ("Tha\u0300nh pho\u0302\u0301 Ho\u0302\u0300 Chi\u0301 Minh, Qua\u0323\u0302n 7, Phu\u031bo\u031b\u0300ng 1", {
+            'street_address': None,
+            'ward': "Phường 1",
+            'district': "Quận 7",
+            'province': "Thành phố Hồ Chí Minh"
+        }),
+        # NFD input: mixed NFD/NFC (edge case)
+        ("Phu\u031bo\u031b\u0300ng 1, Quận 7, Thành phố Hồ Chí Minh", {
+            'street_address': None,
+            'ward': "Phường 1",
+            'district': "Quận 7",
+            'province': "Thành phố Hồ Chí Minh"
+        }),
+    ])
+    def test_parse_address_nfd_normalization(self, address_str, expected):
+        """Test parsing addresses with NFD-decomposed Unicode input.
+
+        macOS and some browsers output NFD text (decomposed accents).
+        The parser must normalize to NFC before keyword matching so that
+        NFD and NFC inputs produce identical results.
+        """
+        result = parse_address(address_str)
+        assert result.street_address == expected['street_address']
+        assert result.ward == expected['ward']
+        assert result.district == expected['district']
+        assert result.province == expected['province']
