@@ -424,3 +424,104 @@ class TestParseAddress:
         assert result.ward == expected['ward']
         assert result.district == expected['district']
         assert result.province == expected['province']
+
+    @pytest.mark.parametrize("address_str,expected", [
+        # P.06  →  Phường 6
+        ("123 Đường ABC P.06, , Quận 8, TP Hồ Chí Minh", {
+            'street_address': "123 Đường ABC",
+            'ward': "Phường 6",
+            'district': "Quận 8",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # P.13  →  Phường 13
+        ("456 Đường XYZ P.13, , Quận 5, TP Hồ Chí Minh", {
+            'street_address': "456 Đường XYZ",
+            'ward': "Phường 13",
+            'district': "Quận 5",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # P.02  →  Phường 2 (strip leading zero)
+        ("789 Đường Test P.02, , Quận Tân Bình, TP Hồ Chí Minh", {
+            'street_address': "789 Đường Test",
+            'ward': "Phường 2",
+            'district': "Quận Tân Bình",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # P.Linh Chiểu  →  Phường Linh Chiểu
+        ("3 Đường DEF P.Linh Chiểu, , Quận 7, TP Hồ Chí Minh", {
+            'street_address': "3 Đường DEF",
+            'ward': "Phường Linh Chiểu",
+            'district': "Quận 7",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # P.Bình Trị Đông B  →  Phường Bình Trị Đông B
+        ("315 Đường GHI P.Bình Trị Đông B, , Quận Bình Tân, TP Hồ Chí Minh", {
+            'street_address': "315 Đường GHI",
+            'ward': "Phường Bình Trị Đông B",
+            'district': "Quận Bình Tân",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # P.Tân Định  →  Phường Tân Định
+        ("12 Đường JKL P.Tân Định, , Quận 1, TP Hồ Chí Minh", {
+            'street_address': "12 Đường JKL",
+            'ward': "Phường Tân Định",
+            'district': "Quận 1",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # Xã Testville A at end of street
+        ("Lô Số 1 KCN Test Xã Testville A, , Huyện Bình Chánh, TP Hồ Chí Minh", {
+            'street_address': "Lô Số 1 KCN Test",
+            'ward': "Xã Testville A",
+            'district': "Huyện Bình Chánh",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # Thị trấn extraction (lower-case 'trấn' should still match)
+        ("42 Đường MNO Thị trấn Testtown, , Huyện Cần Giờ, TP Hồ Chí Minh", {
+            'street_address': "42 Đường MNO",
+            'ward': "Thị trấn Testtown",
+            'district': "Huyện Cần Giờ",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # 3-part with multi-word street and named ward abbreviation
+        ("123 Đường LMN P.An Khánh, , Quận 2, TP Hồ Chí Minh", {
+            'street_address': "123 Đường LMN",
+            'ward': "Phường An Khánh",
+            'district': "Quận 2",
+            'province': "TP Hồ Chí Minh"
+        }),
+    ])
+    def test_parse_address_ward_from_street(self, address_str, expected):
+        """Test extracting ward abbreviation embedded in street when ward slot is empty."""
+        result = parse_address(address_str)
+        assert result.street_address == expected['street_address']
+        assert result.ward == expected['ward']
+        assert result.district == expected['district']
+        assert result.province == expected['province']
+
+    @pytest.mark.parametrize("address_str", [
+        # No double comma — P. should stay in street even if it looks like a ward
+        "123 Đường ABC P.06, Quận 8, TP Hồ Chí Minh",
+        # Ward already present in proper slot — no extraction, street keeps P.
+        "456 Đường XYZ P.13, Phường 13, Quận 5, TP Hồ Chí Minh",
+        # Double comma but no ward pattern at end of street
+        "6A Cửu Long, , Quận Tân Bình, TP Hồ Chí Minh",
+        # Double comma with Xã but no Vietnamese name after it
+        "Lô Số 1 Xã, , Huyện Bình Chánh, TP Hồ Chí Minh",
+        # Normal 4-part address without any abbreviation
+        "123 Lê Lợi, Phường 1, Quận 7, Thành phố Hồ Chí Minh",
+        # P. in the middle of street, not at end
+        "P.06 Building, 123 Đường ABC, Quận 8, TP Hồ Chí Minh",
+    ])
+    def test_parse_address_no_ward_extraction(self, address_str):
+        """Test that ward is NOT extracted when conditions are not met."""
+        result = parse_address(address_str)
+        # Just verify it parses without exception and does not invent a ward
+        # from a street middle fragment
+        assert "P." not in (result.ward or "")
+
+    def test_parse_address_ward_extraction_no_empty_street(self):
+        """Test that extraction is skipped if it would leave an empty street."""
+        # If street were just "P.06" with empty ward slot, do NOT extract
+        result = parse_address("P.06, , Quận 8, TP Hồ Chí Minh")
+        assert result.street_address == "P.06"
+        assert result.ward is None
