@@ -525,3 +525,156 @@ class TestParseAddress:
         result = parse_address("P.06, , Quận 8, TP Hồ Chí Minh")
         assert result.street_address == "P.06"
         assert result.ward is None
+
+    @pytest.mark.parametrize("address_str,expected", [
+        # Province-level cities
+        ("123 Đường A, Phường 1, Quận 1, Thành phố Hồ Chí Minh", {
+            'street_address': "123 Đường A",
+            'ward': "Phường 1",
+            'district': "Quận 1",
+            'province': "Thành phố Hồ Chí Minh"
+        }),
+        ("456 Đường B, Phường 2, Quận 3, TP Hồ Chí Minh", {
+            'street_address': "456 Đường B",
+            'ward': "Phường 2",
+            'district': "Quận 3",
+            'province': "TP Hồ Chí Minh"
+        }),
+        ("789 Đường C, Phường 3, Quận 5, TP. Hồ Chí Minh", {
+            'street_address': "789 Đường C",
+            'ward': "Phường 3",
+            'district': "Quận 5",
+            'province': "TP. Hồ Chí Minh"
+        }),
+        ("111 Đường D, Phường 4, Quận 7, Thành phố Hà Nội", {
+            'street_address': "111 Đường D",
+            'ward': "Phường 4",
+            'district': "Quận 7",
+            'province': "Thành phố Hà Nội"
+        }),
+        ("222 Đường E, Phường 5, Quận 2, TP Hà Nội", {
+            'street_address': "222 Đường E",
+            'ward': "Phường 5",
+            'district': "Quận 2",
+            'province': "TP Hà Nội"
+        }),
+        ("333 Đường F, Phường 6, Quận 4, Thành phố Đà Nẵng", {
+            'street_address': "333 Đường F",
+            'ward': "Phường 6",
+            'district': "Quận 4",
+            'province': "Thành phố Đà Nẵng"
+        }),
+        ("444 Đường G, Phường 7, Quận 6, Thành phố Hải Phòng", {
+            'street_address': "444 Đường G",
+            'ward': "Phường 7",
+            'district': "Quận 6",
+            'province': "Thành phố Hải Phòng"
+        }),
+        ("555 Đường H, Phường 8, Quận 8, Thành phố Cần Thơ", {
+            'street_address': "555 Đường H",
+            'ward': "Phường 8",
+            'district': "Quận 8",
+            'province': "Thành phố Cần Thơ"
+        }),
+        ("666 Đường I, Phường 9, Quận 9, Thành phố Huế", {
+            'street_address': "666 Đường I",
+            'ward': "Phường 9",
+            'district': "Quận 9",
+            'province': "Thành phố Huế"
+        }),
+        # District-level cities (Thành phố trực thuộc tỉnh)
+        ("777 Đường J, Phường 10, Thành phố Thủ Đức, TP Hồ Chí Minh", {
+            'street_address': "777 Đường J",
+            'ward': "Phường 10",
+            'district': "Thành phố Thủ Đức",
+            'province': "TP Hồ Chí Minh"
+        }),
+        ("888 Đường K, Phường 11, Thành phố Biên Hòa, Tỉnh Đồng Nai", {
+            'street_address': "888 Đường K",
+            'ward': "Phường 11",
+            'district': "Thành phố Biên Hòa",
+            'province': "Tỉnh Đồng Nai"
+        }),
+        ("999 Đường L, Phường 12, Thành phố Vũng Tàu, Tỉnh Bà Rịa - Vũng Tàu", {
+            'street_address': "999 Đường L",
+            'ward': "Phường 12",
+            'district': "Thành phố Vũng Tàu",
+            'province': "Tỉnh Bà Rịa - Vũng Tàu"
+        }),
+        ("101 Đường M, Phường 13, Thành phố Nha Trang, Tỉnh Khánh Hòa", {
+            'street_address': "101 Đường M",
+            'ward': "Phường 13",
+            'district': "Thành phố Nha Trang",
+            'province': "Tỉnh Khánh Hòa"
+        }),
+        ("202 Đường N, Phường 14, Thành phố Mỹ Tho, Tỉnh Tiền Giang", {
+            'street_address': "202 Đường N",
+            'ward': "Phường 14",
+            'district': "Thành phố Mỹ Tho",
+            'province': "Tỉnh Tiền Giang"
+        }),
+        ("303 Đường O, Phường 15, Thành phố Long Xuyên, Tỉnh An Giang", {
+            'street_address': "303 Đường O",
+            'ward': "Phường 15",
+            'district': "Thành phố Long Xuyên",
+            'province': "Tỉnh An Giang"
+        }),
+        ("404 Đường P, Phường 16, Thành phố Pleiku, Tỉnh Gia Lai", {
+            'street_address': "404 Đường P",
+            'ward': "Phường 16",
+            'district': "Thành phố Pleiku",
+            'province': "Tỉnh Gia Lai"
+        }),
+        ("505 Đường Q, Phường 17, Thành phố Quy Nhơn, Tỉnh Bình Định", {
+            'street_address': "505 Đường Q",
+            'ward': "Phường 17",
+            'district': "Thành phố Quy Nhơn",
+            'province': "Tỉnh Bình Định"
+        }),
+        ("606 Đường R, Phường 18, Thành phố Đà Lạt, Tỉnh Lâm Đồng", {
+            'street_address': "606 Đường R",
+            'ward': "Phường 18",
+            'district': "Thành phố Đà Lạt",
+            'province': "Tỉnh Lâm Đồng"
+        }),
+        ("707 Đường S, Phường 19, Thành phố Phan Thiết, Tỉnh Bình Thuận", {
+            'street_address': "707 Đường S",
+            'ward': "Phường 19",
+            'district': "Thành phố Phan Thiết",
+            'province': "Tỉnh Bình Thuận"
+        }),
+        ("808 Đường T, Phường 20, Thành phố Thủ Dầu Một, Tỉnh Bình Dương", {
+            'street_address': "808 Đường T",
+            'ward': "Phường 20",
+            'district': "Thành phố Thủ Dầu Một",
+            'province': "Tỉnh Bình Dương"
+        }),
+        # Original failing case: Thành phố Thủ Đức with ward embedded in street
+        ("3 Đường DEF P.Linh Chiểu, , Thành phố Thủ Đức, TP Hồ Chí Minh", {
+            'street_address': "3 Đường DEF",
+            'ward': "Phường Linh Chiểu",
+            'district': "Thành phố Thủ Đức",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # 3-part: district-level city + province (no ward)
+        ("Quận 1, Thành phố Thủ Đức, TP Hồ Chí Minh", {
+            'street_address': None,
+            'ward': None,
+            'district': "Quận 1",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # Reversed order still works
+        ("TP Hồ Chí Minh, Thành phố Thủ Đức, Phường 1", {
+            'street_address': None,
+            'ward': "Phường 1",
+            'district': "Thành phố Thủ Đức",
+            'province': "TP Hồ Chí Minh"
+        }),
+    ])
+    def test_parse_address_thanh_pho_classification(self, address_str, expected):
+        """Test correct classification of province-level vs district-level Thành phố cities."""
+        result = parse_address(address_str)
+        assert result.street_address == expected['street_address']
+        assert result.ward == expected['ward']
+        assert result.district == expected['district']
+        assert result.province == expected['province']

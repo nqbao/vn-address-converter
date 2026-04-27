@@ -4,6 +4,38 @@ import re
 import unicodedata
 from .models import Address, AddressLevel
 
+# Province-level cities (trực thuộc Trung ương).
+# These 6 cities are the only ones whose "Thành phố" prefix means PROVINCE
+# rather than a district-level city (thành phố thuộc tỉnh).
+# Accent-folded lowercase names after stripping the "Thành phố" / "TP" prefix.
+# Includes common aliases (hcm, hn, etc.) and concatenated forms (tphcm, tphn).
+_PROVINCE_LEVEL_CITIES = {
+    'ho chi minh', 'hcm',
+    'ha noi', 'hn', 'hanoi',
+    'da nang', 'danang',
+    'hai phong', 'haiphong',
+    'can tho', 'cantho',
+    'hue',
+}
+
+
+def _is_province_level_city(part_lower: str) -> bool:
+    """Check whether a 'Thành phố' / 'TP' component is a province-level city."""
+    cleaned = part_lower
+    for prefix in ('thành phố ', 'tỉnh ', 'tp ', 'tp. ', 'tp.', 'thanh pho '):
+        if cleaned.startswith(prefix):
+            cleaned = cleaned[len(prefix):].strip()
+            break
+    else:
+        # Handle concatenated forms like tphcm, tphn, tpcantho
+        if cleaned.startswith('tp') and len(cleaned) > 2:
+            cleaned = cleaned[2:].strip()
+
+    # Accent-fold
+    nfd = unicodedata.normalize('NFD', cleaned)
+    folded = ''.join(c for c in nfd if unicodedata.category(c) != 'Mn')
+    return folded in _PROVINCE_LEVEL_CITIES
+
 
 def _extract_ward_from_street(street_address: str) -> tuple[str | None, str | None]:
     """Try to extract a ward name from the end of a street address string.
@@ -106,14 +138,12 @@ def _detect_component_type(part: str) -> AddressLevel:
         if part_lower.startswith(keyword):
             return AddressLevel.PROVINCE
     
-    # For "thành phố" - need to distinguish between province-level cities and district-level
-    # Province-level cities are typically major municipalities
+    # For "thành phố" / "TP" — distinguish province-level cities from district-level
+    # by checking against a known list (HCM, Hà Nội, Đà Nẵng, Hải Phòng, Cần Thơ, Huế).
     if part_lower.startswith('thành phố') or part_lower.startswith('thanh pho') \
-        or part_lower.startswith('tp ') or part_lower.startswith('tp.'):
-        # If it contains multiple words after "thành phố", likely a province
-        # Simple heuristic: if there are 3+ words total, it's probably a province
-        words = part_lower.split()
-        if len(words) >= 3:
+        or part_lower.startswith('tp ') or part_lower.startswith('tp.') \
+        or (part_lower.startswith('tp') and len(part_lower) > 2):
+        if _is_province_level_city(part_lower):
             return AddressLevel.PROVINCE
         else:
             return AddressLevel.DISTRICT
