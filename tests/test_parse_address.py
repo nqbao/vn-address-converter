@@ -259,3 +259,422 @@ class TestParseAddress:
         assert result.ward == "Phường 3"
         assert result.district == "Quận 3"
         assert result.province == "Thành phố Hồ Chí Minh"
+
+    @pytest.mark.parametrize("address_str,expected", [
+        # Thị xã Ninh Hòa (ward, district, province)
+        ("Phường Ninh Giang, Thị xã Ninh Hòa, Tỉnh Khánh Hòa", {
+            'street_address': None,
+            'ward': "Phường Ninh Giang",
+            'district': "Thị xã Ninh Hòa",
+            'province': "Tỉnh Khánh Hòa"
+        }),
+        # Thị xã Bình Minh with street address
+        ("123 Đường Test, Phường Thành Phước, Thị xã Bình Minh, Tỉnh Vĩnh Long", {
+            'street_address': "123 Đường Test",
+            'ward': "Phường Thành Phước",
+            'district': "Thị xã Bình Minh",
+            'province': "Tỉnh Vĩnh Long"
+        }),
+        # Thị xã An Khê (ward, district, province)
+        ("Phường An Bình, Thị xã An Khê, Tỉnh Gia Lai", {
+            'street_address': None,
+            'ward': "Phường An Bình",
+            'district': "Thị xã An Khê",
+            'province': "Tỉnh Gia Lai"
+        }),
+        # Street, ward, Thị xã district, province (4 parts)
+        ("Số 45 Lê Lợi, Phường Ninh Hiệp, Thị xã Ninh Hòa, Tỉnh Khánh Hòa", {
+            'street_address': "Số 45 Lê Lợi",
+            'ward': "Phường Ninh Hiệp",
+            'district': "Thị xã Ninh Hòa",
+            'province': "Tỉnh Khánh Hòa"
+        }),
+        # Thị xã with missing ward (street, district, province)
+        ("456 Trần Phú, Thị xã Bình Minh, Tỉnh Vĩnh Long", {
+            'street_address': "456 Trần Phú",
+            'ward': None,
+            'district': "Thị xã Bình Minh",
+            'province': "Tỉnh Vĩnh Long"
+        }),
+        # Thị xã with non-accented keyword (thi xa)
+        ("Phuong An Binh, Thi xa An Khe, Tinh Gia Lai", {
+            'street_address': None,
+            'ward': "Phuong An Binh",
+            'district': "Thi xa An Khe",
+            'province': "Tinh Gia Lai"
+        }),
+        # Reversed order: district, province, ward (should still resolve)
+        ("Thị xã Ninh Hòa, Tỉnh Khánh Hòa, Phường Ninh Giang", {
+            'street_address': None,
+            'ward': "Phường Ninh Giang",
+            'district': "Thị xã Ninh Hòa",
+            'province': "Tỉnh Khánh Hòa"
+        }),
+        # Thị xã with extra whitespace
+        ("  Phường Ninh Giang  ,  Thị xã Ninh Hòa  ,  Tỉnh Khánh Hòa  ", {
+            'street_address': None,
+            'ward': "Phường Ninh Giang",
+            'district': "Thị xã Ninh Hòa",
+            'province': "Tỉnh Khánh Hòa"
+        }),
+        # Multiple street parts before ward/district/province
+        ("Tầng 2, Tòa nhà A, Phường Ninh Giang, Thị xã Ninh Hòa, Tỉnh Khánh Hòa", {
+            'street_address': "Tầng 2, Tòa nhà A",
+            'ward': "Phường Ninh Giang",
+            'district': "Thị xã Ninh Hòa",
+            'province': "Tỉnh Khánh Hòa"
+        }),
+    ])
+    def test_parse_address_thi_xa_district(self, address_str, expected):
+        """Test parsing addresses with 'Thị xã' district prefix."""
+        result = parse_address(address_str)
+        assert result.street_address == expected['street_address']
+        assert result.ward == expected['ward']
+        assert result.district == expected['district']
+        assert result.province == expected['province']
+
+    @pytest.mark.parametrize("address_str,expected", [
+        ("Phường 1\nQuận 7\nThành phố Hồ Chí Minh", {
+            'street_address': None,
+            'ward': "Phường 1",
+            'district': "Quận 7",
+            'province': "Thành phố Hồ Chí Minh"
+        }),
+        ("123 Lê Lợi\r\nPhường 2\r\nQuận 1\r\nThành phố Hồ Chí Minh", {
+            'street_address': "123 Lê Lợi",
+            'ward': "Phường 2",
+            'district': "Quận 1",
+            'province': "Thành phố Hồ Chí Minh"
+        }),
+        ("Phường Ninh Giang\nThị xã Ninh Hòa\nTỉnh Khánh Hòa", {
+            'street_address': None,
+            'ward': "Phường Ninh Giang",
+            'district': "Thị xã Ninh Hòa",
+            'province': "Tỉnh Khánh Hòa"
+        }),
+        # Mixed newline and comma
+        ("Tầng 2\nTòa nhà A, Phường 1, Quận 7, Thành phố Hồ Chí Minh", {
+            'street_address': "Tầng 2, Tòa nhà A",
+            'ward': "Phường 1",
+            'district': "Quận 7",
+            'province': "Thành phố Hồ Chí Minh"
+        }),
+    ])
+    def test_parse_address_newlines(self, address_str, expected):
+        """Test parsing addresses with newline separators."""
+        result = parse_address(address_str)
+        assert result.street_address == expected['street_address']
+        assert result.ward == expected['ward']
+        assert result.district == expected['district']
+        assert result.province == expected['province']
+
+    @pytest.mark.parametrize("address_str,expected", [
+        # NFD decomposed input: basic 3-part (macOS-style decomposed Unicode)
+        ("Phu\u031bo\u031b\u0300ng 1, Qua\u0323\u0302n 7, Tha\u0300nh pho\u0302\u0301 Ho\u0302\u0300 Chi\u0301 Minh", {
+            'street_address': None,
+            'ward': "Phường 1",
+            'district': "Quận 7",
+            'province': "Thành phố Hồ Chí Minh"
+        }),
+        # NFD input: 4-part with street
+        ("123 Nguye\u0302\u0303n Tra\u0303i, Phu\u031bo\u031b\u0300ng 2, Qua\u0323\u0302n 1, Tha\u0300nh pho\u0302\u0301 Ho\u0302\u0300 Chi\u0301 Minh", {
+            'street_address': "123 Nguyễn Trãi",
+            'ward': "Phường 2",
+            'district': "Quận 1",
+            'province': "Thành phố Hồ Chí Minh"
+        }),
+        # NFD input: Thị xã district
+        ("Phu\u031bo\u031b\u0300ng Ninh Giang, Thi\u0323 xa\u0303 Ninh Ho\u0300a, Ti\u0309nh Kha\u0301nh Ho\u0300a", {
+            'street_address': None,
+            'ward': "Phường Ninh Giang",
+            'district': "Thị xã Ninh Hòa",
+            'province': "Tỉnh Khánh Hòa"
+        }),
+        # NFD input: Việt Nam suffix should be stripped
+        ("Phu\u031bo\u031b\u0300ng 1, Qua\u0323\u0302n 7, Tha\u0300nh pho\u0302\u0301 Ho\u0302\u0300 Chi\u0301 Minh, Vie\u0323\u0302t Nam", {
+            'street_address': None,
+            'ward': "Phường 1",
+            'district': "Quận 7",
+            'province': "Thành phố Hồ Chí Minh"
+        }),
+        # NFD input: reversed order (heuristic must still work)
+        ("Tha\u0300nh pho\u0302\u0301 Ho\u0302\u0300 Chi\u0301 Minh, Qua\u0323\u0302n 7, Phu\u031bo\u031b\u0300ng 1", {
+            'street_address': None,
+            'ward': "Phường 1",
+            'district': "Quận 7",
+            'province': "Thành phố Hồ Chí Minh"
+        }),
+        # NFD input: mixed NFD/NFC (edge case)
+        ("Phu\u031bo\u031b\u0300ng 1, Quận 7, Thành phố Hồ Chí Minh", {
+            'street_address': None,
+            'ward': "Phường 1",
+            'district': "Quận 7",
+            'province': "Thành phố Hồ Chí Minh"
+        }),
+    ])
+    def test_parse_address_nfd_normalization(self, address_str, expected):
+        """Test parsing addresses with NFD-decomposed Unicode input.
+
+        macOS and some browsers output NFD text (decomposed accents).
+        The parser must normalize to NFC before keyword matching so that
+        NFD and NFC inputs produce identical results.
+        """
+        result = parse_address(address_str)
+        assert result.street_address == expected['street_address']
+        assert result.ward == expected['ward']
+        assert result.district == expected['district']
+        assert result.province == expected['province']
+
+    @pytest.mark.parametrize("address_str,expected", [
+        # P.06  →  Phường 6
+        ("123 Đường ABC P.06, , Quận 8, TP Hồ Chí Minh", {
+            'street_address': "123 Đường ABC",
+            'ward': "Phường 6",
+            'district': "Quận 8",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # P.13  →  Phường 13
+        ("456 Đường XYZ P.13, , Quận 5, TP Hồ Chí Minh", {
+            'street_address': "456 Đường XYZ",
+            'ward': "Phường 13",
+            'district': "Quận 5",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # P.02  →  Phường 2 (strip leading zero)
+        ("789 Đường Test P.02, , Quận Tân Bình, TP Hồ Chí Minh", {
+            'street_address': "789 Đường Test",
+            'ward': "Phường 2",
+            'district': "Quận Tân Bình",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # P.Linh Chiểu  →  Phường Linh Chiểu
+        ("3 Đường DEF P.Linh Chiểu, , Quận 7, TP Hồ Chí Minh", {
+            'street_address': "3 Đường DEF",
+            'ward': "Phường Linh Chiểu",
+            'district': "Quận 7",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # P.Bình Trị Đông B  →  Phường Bình Trị Đông B
+        ("315 Đường GHI P.Bình Trị Đông B, , Quận Bình Tân, TP Hồ Chí Minh", {
+            'street_address': "315 Đường GHI",
+            'ward': "Phường Bình Trị Đông B",
+            'district': "Quận Bình Tân",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # P.Tân Định  →  Phường Tân Định
+        ("12 Đường JKL P.Tân Định, , Quận 1, TP Hồ Chí Minh", {
+            'street_address': "12 Đường JKL",
+            'ward': "Phường Tân Định",
+            'district': "Quận 1",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # Xã Testville A at end of street
+        ("Lô Số 1 KCN Test Xã Testville A, , Huyện Bình Chánh, TP Hồ Chí Minh", {
+            'street_address': "Lô Số 1 KCN Test",
+            'ward': "Xã Testville A",
+            'district': "Huyện Bình Chánh",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # Thị trấn extraction (lower-case 'trấn' should still match)
+        ("42 Đường MNO Thị trấn Testtown, , Huyện Cần Giờ, TP Hồ Chí Minh", {
+            'street_address': "42 Đường MNO",
+            'ward': "Thị trấn Testtown",
+            'district': "Huyện Cần Giờ",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # 3-part with multi-word street and named ward abbreviation
+        ("123 Đường LMN P.An Khánh, , Quận 2, TP Hồ Chí Minh", {
+            'street_address': "123 Đường LMN",
+            'ward': "Phường An Khánh",
+            'district': "Quận 2",
+            'province': "TP Hồ Chí Minh"
+        }),
+    ])
+    def test_parse_address_ward_from_street(self, address_str, expected):
+        """Test extracting ward abbreviation embedded in street when ward slot is empty."""
+        result = parse_address(address_str)
+        assert result.street_address == expected['street_address']
+        assert result.ward == expected['ward']
+        assert result.district == expected['district']
+        assert result.province == expected['province']
+
+    @pytest.mark.parametrize("address_str", [
+        # No double comma — P. should stay in street even if it looks like a ward
+        "123 Đường ABC P.06, Quận 8, TP Hồ Chí Minh",
+        # Ward already present in proper slot — no extraction, street keeps P.
+        "456 Đường XYZ P.13, Phường 13, Quận 5, TP Hồ Chí Minh",
+        # Double comma but no ward pattern at end of street
+        "6A Cửu Long, , Quận Tân Bình, TP Hồ Chí Minh",
+        # Double comma with Xã but no Vietnamese name after it
+        "Lô Số 1 Xã, , Huyện Bình Chánh, TP Hồ Chí Minh",
+        # Normal 4-part address without any abbreviation
+        "123 Lê Lợi, Phường 1, Quận 7, Thành phố Hồ Chí Minh",
+        # P. in the middle of street, not at end
+        "P.06 Building, 123 Đường ABC, Quận 8, TP Hồ Chí Minh",
+    ])
+    def test_parse_address_no_ward_extraction(self, address_str):
+        """Test that ward is NOT extracted when conditions are not met."""
+        result = parse_address(address_str)
+        # Just verify it parses without exception and does not invent a ward
+        # from a street middle fragment
+        assert "P." not in (result.ward or "")
+
+    def test_parse_address_ward_extraction_no_empty_street(self):
+        """Test that extraction is skipped if it would leave an empty street."""
+        # If street were just "P.06" with empty ward slot, do NOT extract
+        result = parse_address("P.06, , Quận 8, TP Hồ Chí Minh")
+        assert result.street_address == "P.06"
+        assert result.ward is None
+
+    @pytest.mark.parametrize("address_str,expected", [
+        # Province-level cities
+        ("123 Đường A, Phường 1, Quận 1, Thành phố Hồ Chí Minh", {
+            'street_address': "123 Đường A",
+            'ward': "Phường 1",
+            'district': "Quận 1",
+            'province': "Thành phố Hồ Chí Minh"
+        }),
+        ("456 Đường B, Phường 2, Quận 3, TP Hồ Chí Minh", {
+            'street_address': "456 Đường B",
+            'ward': "Phường 2",
+            'district': "Quận 3",
+            'province': "TP Hồ Chí Minh"
+        }),
+        ("789 Đường C, Phường 3, Quận 5, TP. Hồ Chí Minh", {
+            'street_address': "789 Đường C",
+            'ward': "Phường 3",
+            'district': "Quận 5",
+            'province': "TP. Hồ Chí Minh"
+        }),
+        ("111 Đường D, Phường 4, Quận 7, Thành phố Hà Nội", {
+            'street_address': "111 Đường D",
+            'ward': "Phường 4",
+            'district': "Quận 7",
+            'province': "Thành phố Hà Nội"
+        }),
+        ("222 Đường E, Phường 5, Quận 2, TP Hà Nội", {
+            'street_address': "222 Đường E",
+            'ward': "Phường 5",
+            'district': "Quận 2",
+            'province': "TP Hà Nội"
+        }),
+        ("333 Đường F, Phường 6, Quận 4, Thành phố Đà Nẵng", {
+            'street_address': "333 Đường F",
+            'ward': "Phường 6",
+            'district': "Quận 4",
+            'province': "Thành phố Đà Nẵng"
+        }),
+        ("444 Đường G, Phường 7, Quận 6, Thành phố Hải Phòng", {
+            'street_address': "444 Đường G",
+            'ward': "Phường 7",
+            'district': "Quận 6",
+            'province': "Thành phố Hải Phòng"
+        }),
+        ("555 Đường H, Phường 8, Quận 8, Thành phố Cần Thơ", {
+            'street_address': "555 Đường H",
+            'ward': "Phường 8",
+            'district': "Quận 8",
+            'province': "Thành phố Cần Thơ"
+        }),
+        ("666 Đường I, Phường 9, Quận 9, Thành phố Huế", {
+            'street_address': "666 Đường I",
+            'ward': "Phường 9",
+            'district': "Quận 9",
+            'province': "Thành phố Huế"
+        }),
+        # District-level cities (Thành phố trực thuộc tỉnh)
+        ("777 Đường J, Phường 10, Thành phố Thủ Đức, TP Hồ Chí Minh", {
+            'street_address': "777 Đường J",
+            'ward': "Phường 10",
+            'district': "Thành phố Thủ Đức",
+            'province': "TP Hồ Chí Minh"
+        }),
+        ("888 Đường K, Phường 11, Thành phố Biên Hòa, Tỉnh Đồng Nai", {
+            'street_address': "888 Đường K",
+            'ward': "Phường 11",
+            'district': "Thành phố Biên Hòa",
+            'province': "Tỉnh Đồng Nai"
+        }),
+        ("999 Đường L, Phường 12, Thành phố Vũng Tàu, Tỉnh Bà Rịa - Vũng Tàu", {
+            'street_address': "999 Đường L",
+            'ward': "Phường 12",
+            'district': "Thành phố Vũng Tàu",
+            'province': "Tỉnh Bà Rịa - Vũng Tàu"
+        }),
+        ("101 Đường M, Phường 13, Thành phố Nha Trang, Tỉnh Khánh Hòa", {
+            'street_address': "101 Đường M",
+            'ward': "Phường 13",
+            'district': "Thành phố Nha Trang",
+            'province': "Tỉnh Khánh Hòa"
+        }),
+        ("202 Đường N, Phường 14, Thành phố Mỹ Tho, Tỉnh Tiền Giang", {
+            'street_address': "202 Đường N",
+            'ward': "Phường 14",
+            'district': "Thành phố Mỹ Tho",
+            'province': "Tỉnh Tiền Giang"
+        }),
+        ("303 Đường O, Phường 15, Thành phố Long Xuyên, Tỉnh An Giang", {
+            'street_address': "303 Đường O",
+            'ward': "Phường 15",
+            'district': "Thành phố Long Xuyên",
+            'province': "Tỉnh An Giang"
+        }),
+        ("404 Đường P, Phường 16, Thành phố Pleiku, Tỉnh Gia Lai", {
+            'street_address': "404 Đường P",
+            'ward': "Phường 16",
+            'district': "Thành phố Pleiku",
+            'province': "Tỉnh Gia Lai"
+        }),
+        ("505 Đường Q, Phường 17, Thành phố Quy Nhơn, Tỉnh Bình Định", {
+            'street_address': "505 Đường Q",
+            'ward': "Phường 17",
+            'district': "Thành phố Quy Nhơn",
+            'province': "Tỉnh Bình Định"
+        }),
+        ("606 Đường R, Phường 18, Thành phố Đà Lạt, Tỉnh Lâm Đồng", {
+            'street_address': "606 Đường R",
+            'ward': "Phường 18",
+            'district': "Thành phố Đà Lạt",
+            'province': "Tỉnh Lâm Đồng"
+        }),
+        ("707 Đường S, Phường 19, Thành phố Phan Thiết, Tỉnh Bình Thuận", {
+            'street_address': "707 Đường S",
+            'ward': "Phường 19",
+            'district': "Thành phố Phan Thiết",
+            'province': "Tỉnh Bình Thuận"
+        }),
+        ("808 Đường T, Phường 20, Thành phố Thủ Dầu Một, Tỉnh Bình Dương", {
+            'street_address': "808 Đường T",
+            'ward': "Phường 20",
+            'district': "Thành phố Thủ Dầu Một",
+            'province': "Tỉnh Bình Dương"
+        }),
+        # Original failing case: Thành phố Thủ Đức with ward embedded in street
+        ("3 Đường DEF P.Linh Chiểu, , Thành phố Thủ Đức, TP Hồ Chí Minh", {
+            'street_address': "3 Đường DEF",
+            'ward': "Phường Linh Chiểu",
+            'district': "Thành phố Thủ Đức",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # 3-part: district-level city + province (no ward)
+        ("Quận 1, Thành phố Thủ Đức, TP Hồ Chí Minh", {
+            'street_address': None,
+            'ward': None,
+            'district': "Quận 1",
+            'province': "TP Hồ Chí Minh"
+        }),
+        # Reversed order still works
+        ("TP Hồ Chí Minh, Thành phố Thủ Đức, Phường 1", {
+            'street_address': None,
+            'ward': "Phường 1",
+            'district': "Thành phố Thủ Đức",
+            'province': "TP Hồ Chí Minh"
+        }),
+    ])
+    def test_parse_address_thanh_pho_classification(self, address_str, expected):
+        """Test correct classification of province-level vs district-level Thành phố cities."""
+        result = parse_address(address_str)
+        assert result.street_address == expected['street_address']
+        assert result.ward == expected['ward']
+        assert result.district == expected['district']
+        assert result.province == expected['province']

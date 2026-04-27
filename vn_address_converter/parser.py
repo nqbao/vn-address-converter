@@ -1,7 +1,118 @@
 """Address parsing functionality for Vietnamese addresses."""
 
 import re
+import unicodedata
 from .models import Address, AddressLevel
+
+# Province-level cities (trực thuộc Trung ương).
+# These 6 cities are the only ones whose "Thành phố" prefix means PROVINCE
+# rather than a district-level city (thành phố thuộc tỉnh).
+# Accent-folded lowercase names after stripping the "Thành phố" / "TP" prefix.
+# Includes common aliases (hcm, hn, etc.) and concatenated forms (tphcm, tphn).
+_PROVINCE_LEVEL_CITIES = {
+    'ho chi minh', 'hcm',
+    'ha noi', 'hn', 'hanoi',
+    'da nang', 'danang',
+    'hai phong', 'haiphong',
+    'can tho', 'cantho',
+    'hue',
+}
+
+
+def _is_province_level_city(part_lower: str) -> bool:
+    """Check whether a 'Thành phố' / 'TP' component is a province-level city."""
+    cleaned = part_lower
+    for prefix in ('thành phố ', 'tỉnh ', 'tp ', 'tp. ', 'tp.', 'thanh pho '):
+        if cleaned.startswith(prefix):
+            cleaned = cleaned[len(prefix):].strip()
+            break
+    else:
+        # Handle concatenated forms like tphcm, tphn, tpcantho
+        if cleaned.startswith('tp') and len(cleaned) > 2:
+            cleaned = cleaned[2:].strip()
+
+    # Accent-fold
+    nfd = unicodedata.normalize('NFD', cleaned)
+    folded = ''.join(c for c in nfd if unicodedata.category(c) != 'Mn')
+    return folded in _PROVINCE_LEVEL_CITIES
+
+
+def _extract_ward_from_street(street_address: str) -> tuple[str | None, str | None]:
+    """Try to extract a ward name from the end of a street address string.
+
+    In some Vietnamese address formats the ward abbreviation is embedded
+    in the street component, e.g. 'Phạm Thế Hiển P.06' or 'Võ Văn Ngân
+    P.Linh Chiểu'.  This helper recognises common abbreviation patterns
+    at the end of the street part and returns the trimmed street plus
+    the expanded ward name.
+
+    Returns:
+        (new_street_address, extracted_ward) or (street_address, None)
+    """
+    if not street_address:
+        return street_address, None
+
+    _VIETNAMESE_VOWELS = (
+        'aeiouy'
+        'àáảãạâầấẩẫậăằắẳẵặ'
+        'èéẻẽẹêềếểễệ'
+        'ìíỉĩị'
+        'òóỏõọôồốổỗộơờớởỡợ'
+        'ùúủũụưừứửữự'
+        'ỳýỷỹỵ'
+    )
+
+    def _has_vietnamese(text: str) -> bool:
+        return any(ch.lower() in _VIETNAMESE_VOWELS for ch in text)
+
+    # Pattern 1: P.06, P.13, P.02  →  Phường {number} (strip leading zeros)
+    m = re.search(r'\s+P\.(\d{1,3})\s*$', street_address)
+    if m:
+        ward_num = str(int(m.group(1)))
+        new_street = street_address[: m.start()].strip()
+        if new_street:
+            return new_street, f'Phường {ward_num}'
+
+    # Pattern 2: P.Linh Chiểu, P.Bình Trị Đông B, P.Tân Định  →  Phường {name}
+    m = re.search(
+        r'\s+P\.([A-ZÀ-Ỹa-zà-ỹ0-9\s\-]{1,40})\s*$',
+        street_address,
+    )
+    if m:
+        ward_name = m.group(1).strip()
+        # Sanity check: must look like a Vietnamese place name
+        if ward_name and _has_vietnamese(ward_name) and len(ward_name) >= 1:
+            new_street = street_address[: m.start()].strip()
+            if new_street:
+                return new_street, f'Phường {ward_name}'
+
+    # Pattern 3: Xã Vĩnh Lộc A  →  Xã {name}
+    m = re.search(
+        r'\s+(Xã)\s+([A-ZÀ-Ỹa-zà-ỹ0-9\s\-]{1,40})\s*$',
+        street_address,
+        re.IGNORECASE,
+    )
+    if m:
+        ward_name = m.group(2).strip()
+        if ward_name and _has_vietnamese(ward_name) and len(ward_name) >= 1:
+            new_street = street_address[: m.start()].strip()
+            if new_street:
+                return new_street, m.group(1) + ' ' + ward_name
+
+    # Pattern 4: Thị trấn something  →  Thị trấn {name}
+    m = re.search(
+        r'\s+(Thị trấn)\s+([A-ZÀ-Ỹa-zà-ỹ0-9\s\-]{1,40})\s*$',
+        street_address,
+        re.IGNORECASE,
+    )
+    if m:
+        ward_name = m.group(2).strip()
+        if ward_name and _has_vietnamese(ward_name) and len(ward_name) >= 1:
+            new_street = street_address[: m.start()].strip()
+            if new_street:
+                return new_street, m.group(1) + ' ' + ward_name
+
+    return street_address, None
 
 
 def _detect_component_type(part: str) -> AddressLevel:
@@ -27,20 +138,18 @@ def _detect_component_type(part: str) -> AddressLevel:
         if part_lower.startswith(keyword):
             return AddressLevel.PROVINCE
     
-    # For "thành phố" - need to distinguish between province-level cities and district-level
-    # Province-level cities are typically major municipalities
+    # For "thành phố" / "TP" — distinguish province-level cities from district-level
+    # by checking against a known list (HCM, Hà Nội, Đà Nẵng, Hải Phòng, Cần Thơ, Huế).
     if part_lower.startswith('thành phố') or part_lower.startswith('thanh pho') \
-        or part_lower.startswith('tp ') or part_lower.startswith('tp.'):
-        # If it contains multiple words after "thành phố", likely a province
-        # Simple heuristic: if there are 3+ words total, it's probably a province
-        words = part_lower.split()
-        if len(words) >= 3:
+        or part_lower.startswith('tp ') or part_lower.startswith('tp.') \
+        or (part_lower.startswith('tp') and len(part_lower) > 2):
+        if _is_province_level_city(part_lower):
             return AddressLevel.PROVINCE
         else:
             return AddressLevel.DISTRICT
     
-    # District keywords  
-    district_keywords = ['quận', 'quan', 'huyện', 'huyen', 'tp']
+    # District keywords
+    district_keywords = ['quận', 'quan', 'huyện', 'huyen', 'tp', 'thị xã', 'thi xa']
     for keyword in district_keywords:
         if part_lower.startswith(keyword):
             return AddressLevel.DISTRICT
@@ -66,19 +175,30 @@ def parse_address(address_string: str) -> Address:
     """
     if not address_string or not address_string.strip():
         raise ValueError("Address string cannot be empty")
-    
+
+    # Normalize Unicode to NFC so that keyword matching works consistently
+    # regardless of whether input is composed (NFC) or decomposed (NFD)
+    address_string = unicodedata.normalize("NFC", address_string)
+
+    # Normalize newlines to commas so copy-pasted multi-line addresses parse correctly
+    address_string = address_string.replace('\r\n', ', ').replace('\r', ', ').replace('\n', ', ')
+
     # Try different separators in order of preference
     separators = [',', ';', '|', '-']
     parts = None
+    has_empty_slot = False
     
     for separator in separators:
         if separator in address_string:
-            parts = [part.strip() for part in address_string.split(separator) if part.strip()]
+            raw_parts = [part.strip() for part in address_string.split(separator)]
+            has_empty_slot = any(p == '' for p in raw_parts)
+            parts = [p for p in raw_parts if p]
             break
     
     if parts is None:
         # No separator found, treat as single component
         parts = [address_string.strip()]
+        has_empty_slot = False
 
     if parts[-1] in ("Việt Nam", "Vienam"):
         # Remove "Việt Nam" if it's the last part
@@ -165,6 +285,15 @@ def parse_address(address_string: str) -> Address:
         ward, district, province = parts[-3:]
         street_address = ", ".join(parts[:-3])
     
+    # If ward is missing and the original address had an empty structural slot
+    # (e.g. "street, , district, province"), try to recover a ward abbreviation
+    # that was embedded in the street component, such as P.06 or P.Linh Chiểu.
+    if ward is None and street_address and has_empty_slot:
+        extracted_street, extracted_ward = _extract_ward_from_street(street_address)
+        if extracted_ward:
+            street_address = extracted_street
+            ward = extracted_ward
+
     return Address(
         street_address=street_address if street_address else None,
         ward=ward if ward else None,
