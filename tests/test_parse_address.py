@@ -332,3 +332,38 @@ class TestParseAddress:
         assert result.ward == expected['ward']
         assert result.district == expected['district']
         assert result.province == expected['province']
+
+    @pytest.mark.parametrize("address_str,expected", [
+        ("Phường 1\nQuận 7\nThành phố Hồ Chí Minh", {
+            'street_address': None,
+            'ward': "Phường 1",
+            'district': "Quận 7",
+            'province': "Thành phố Hồ Chí Minh"
+        }),
+        ("123 Lê Lợi\r\nPhường 2\r\nQuận 1\r\nThành phố Hồ Chí Minh", {
+            'street_address': "123 Lê Lợi",
+            'ward': "Phường 2",
+            'district': "Quận 1",
+            'province': "Thành phố Hồ Chí Minh"
+        }),
+        ("Phường Ninh Giang\nThị xã Ninh Hòa\nTỉnh Khánh Hòa", {
+            'street_address': None,
+            'ward': "Phường Ninh Giang",
+            'district': "Thị xã Ninh Hòa",
+            'province': "Tỉnh Khánh Hòa"
+        }),
+        # Mixed newline and comma
+        ("Tầng 2\nTòa nhà A, Phường 1, Quận 7, Thành phố Hồ Chí Minh", {
+            'street_address': "Tầng 2, Tòa nhà A",
+            'ward': "Phường 1",
+            'district': "Quận 7",
+            'province': "Thành phố Hồ Chí Minh"
+        }),
+    ])
+    def test_parse_address_newlines(self, address_str, expected):
+        """Test parsing addresses with newline separators."""
+        result = parse_address(address_str)
+        assert result.street_address == expected['street_address']
+        assert result.ward == expected['ward']
+        assert result.district == expected['district']
+        assert result.province == expected['province']

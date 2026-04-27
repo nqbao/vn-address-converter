@@ -66,7 +66,10 @@ def parse_address(address_string: str) -> Address:
     """
     if not address_string or not address_string.strip():
         raise ValueError("Address string cannot be empty")
-    
+
+    # Normalize newlines to commas so copy-pasted multi-line addresses parse correctly
+    address_string = address_string.replace('\r\n', ', ').replace('\r', ', ').replace('\n', ', ')
+
     # Try different separators in order of preference
     separators = [',', ';', '|', '-']
     parts = None
