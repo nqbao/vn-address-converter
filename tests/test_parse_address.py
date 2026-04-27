@@ -259,3 +259,76 @@ class TestParseAddress:
         assert result.ward == "Phường 3"
         assert result.district == "Quận 3"
         assert result.province == "Thành phố Hồ Chí Minh"
+
+    @pytest.mark.parametrize("address_str,expected", [
+        # Thị xã Ninh Hòa (ward, district, province)
+        ("Phường Ninh Giang, Thị xã Ninh Hòa, Tỉnh Khánh Hòa", {
+            'street_address': None,
+            'ward': "Phường Ninh Giang",
+            'district': "Thị xã Ninh Hòa",
+            'province': "Tỉnh Khánh Hòa"
+        }),
+        # Thị xã Bình Minh with street address
+        ("123 Đường Test, Phường Thành Phước, Thị xã Bình Minh, Tỉnh Vĩnh Long", {
+            'street_address': "123 Đường Test",
+            'ward': "Phường Thành Phước",
+            'district': "Thị xã Bình Minh",
+            'province': "Tỉnh Vĩnh Long"
+        }),
+        # Thị xã An Khê (ward, district, province)
+        ("Phường An Bình, Thị xã An Khê, Tỉnh Gia Lai", {
+            'street_address': None,
+            'ward': "Phường An Bình",
+            'district': "Thị xã An Khê",
+            'province': "Tỉnh Gia Lai"
+        }),
+        # Street, ward, Thị xã district, province (4 parts)
+        ("Số 45 Lê Lợi, Phường Ninh Hiệp, Thị xã Ninh Hòa, Tỉnh Khánh Hòa", {
+            'street_address': "Số 45 Lê Lợi",
+            'ward': "Phường Ninh Hiệp",
+            'district': "Thị xã Ninh Hòa",
+            'province': "Tỉnh Khánh Hòa"
+        }),
+        # Thị xã with missing ward (street, district, province)
+        ("456 Trần Phú, Thị xã Bình Minh, Tỉnh Vĩnh Long", {
+            'street_address': "456 Trần Phú",
+            'ward': None,
+            'district': "Thị xã Bình Minh",
+            'province': "Tỉnh Vĩnh Long"
+        }),
+        # Thị xã with non-accented keyword (thi xa)
+        ("Phuong An Binh, Thi xa An Khe, Tinh Gia Lai", {
+            'street_address': None,
+            'ward': "Phuong An Binh",
+            'district': "Thi xa An Khe",
+            'province': "Tinh Gia Lai"
+        }),
+        # Reversed order: district, province, ward (should still resolve)
+        ("Thị xã Ninh Hòa, Tỉnh Khánh Hòa, Phường Ninh Giang", {
+            'street_address': None,
+            'ward': "Phường Ninh Giang",
+            'district': "Thị xã Ninh Hòa",
+            'province': "Tỉnh Khánh Hòa"
+        }),
+        # Thị xã with extra whitespace
+        ("  Phường Ninh Giang  ,  Thị xã Ninh Hòa  ,  Tỉnh Khánh Hòa  ", {
+            'street_address': None,
+            'ward': "Phường Ninh Giang",
+            'district': "Thị xã Ninh Hòa",
+            'province': "Tỉnh Khánh Hòa"
+        }),
+        # Multiple street parts before ward/district/province
+        ("Tầng 2, Tòa nhà A, Phường Ninh Giang, Thị xã Ninh Hòa, Tỉnh Khánh Hòa", {
+            'street_address': "Tầng 2, Tòa nhà A",
+            'ward': "Phường Ninh Giang",
+            'district': "Thị xã Ninh Hòa",
+            'province': "Tỉnh Khánh Hòa"
+        }),
+    ])
+    def test_parse_address_thi_xa_district(self, address_str, expected):
+        """Test parsing addresses with 'Thị xã' district prefix."""
+        result = parse_address(address_str)
+        assert result.street_address == expected['street_address']
+        assert result.ward == expected['ward']
+        assert result.district == expected['district']
+        assert result.province == expected['province']

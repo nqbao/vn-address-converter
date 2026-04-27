@@ -39,8 +39,8 @@ def _detect_component_type(part: str) -> AddressLevel:
         else:
             return AddressLevel.DISTRICT
     
-    # District keywords  
-    district_keywords = ['quận', 'quan', 'huyện', 'huyen', 'tp']
+    # District keywords
+    district_keywords = ['quận', 'quan', 'huyện', 'huyen', 'tp', 'thị xã', 'thi xa']
     for keyword in district_keywords:
         if part_lower.startswith(keyword):
             return AddressLevel.DISTRICT
